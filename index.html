@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0818"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Key Roll">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Key Roll">
 <link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -412,7 +412,7 @@ nav{height:58px;align-items:center}
 @keyframes armp{to{transform:scale(1.04)}}
 .card .kinfo{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;border:1px solid var(--line);color:var(--mute);font:italic 700 11px Georgia,serif;display:flex;align-items:center;justify-content:center;background:rgba(10,6,22,.6);z-index:2}
 .bkrow{display:flex;gap:8px;margin:4px 0 10px}.bkrow button{flex:1;font-size:12px;padding:8px}
-html{height:100%;background:var(--bg)}body{position:fixed;inset:0;height:auto!important}
+html{height:100%;background:var(--bg);touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:auto!important;margin:0;touch-action:manipulation}body.sa{bottom:auto;height:var(--appH)!important}*{touch-action:manipulation}
 #intro{position:fixed;inset:0;z-index:200;background:radial-gradient(circle at 50% 42%,#2a1866 0%,#120a33 40%,#05030c 100%);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease,transform .5s cubic-bezier(.5,0,.8,.4)}
 #intro canvas{position:absolute;inset:0;width:100%;height:100%}
 #intro.out{opacity:0;transform:scale(1.18);pointer-events:none}
@@ -1003,6 +1003,13 @@ $id("mute").onclick=()=>{S.muted=!S.muted;ac();if(master)master.gain.setTargetAt
 function setMuteIcon(){const m=$id("mute");m.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>'+(S.muted?'<path d="M17 9l5 6M22 9l-5 6"/>':'<path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>')+'</svg>';m.setAttribute("aria-label",S.muted?"Sound off":"Sound on")}
 function $id(x){return document.getElementById(x)}
 
+let APPH=0;function H(){return APPH||innerHeight}
+function fixVH(){let sa=false;try{sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches}catch(e){}
+  if(!sa){APPH=0;document.body.classList.remove("sa");return}const port=innerWidth<innerHeight,sh=port?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height);
+  APPH=Math.max(innerHeight,sh);document.documentElement.style.setProperty("--appH",APPH+"px");document.body.classList.add("sa")}
+fixVH();addEventListener("resize",fixVH);addEventListener("orientationchange",()=>setTimeout(()=>{fixVH();try{fit()}catch(e){}},300));
+document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 /* ================= STATE ================= */
 let S={v:2,counts:{},grade:{},rolls:0,best:-1,hat:null,name:"",muted:false,lucky:0,mega:0,matches:0,bestChain:0,fused:{},fusedEver:{},pity:{},fuses:0,equip:[],charges:0,surge:0,chests:0};
 const LS="plushroll-keys-v1";
@@ -1032,16 +1039,16 @@ const bg=$id("bg"),bc=bg.getContext("2d"),fx=$id("fx"),fc=fx.getContext("2d"),st
 let DPR=1;
 const _spr={};function glowSpr(col){let s=_spr[col];if(!s){s=document.createElement("canvas");s.width=s.height=64;const c=s.getContext("2d"),g=c.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,colA(col,1));g.addColorStop(1,colA(col,0));c.fillStyle=g;c.fillRect(0,0,64,64);_spr[col]=s}return s}
 let _coin=null;function coinSpr(){if(!_coin){_coin=document.createElement("canvas");_coin.width=_coin.height=48;const c=_coin.getContext("2d");c.translate(24,24);const r=21,g=c.createRadialGradient(-r*.35,-r*.4,r*.08,0,0,r);g.addColorStop(0,"#fffbe0");g.addColorStop(.45,"#ffd84a");g.addColorStop(1,"#b0730e");c.fillStyle=g;c.beginPath();c.arc(0,0,r,0,7);c.fill();c.lineWidth=r*.16;c.strokeStyle="#7d4c05";c.stroke();c.beginPath();c.arc(0,0,r*.64,0,7);c.lineWidth=r*.09;c.strokeStyle="rgba(125,76,5,.65)";c.stroke();star(c,0,0,r*.4,5,.45);c.fillStyle="#fff3b0";c.fill()}return _coin}
-function fit(){DPR=Math.min(devicePixelRatio||1,1.5);[[bg,bc],[fx,fc]].forEach(([cv,c])=>{cv.width=innerWidth*DPR;cv.height=innerHeight*DPR;c.setTransform(DPR,0,0,DPR,0,0)});
+function fit(){DPR=Math.min(devicePixelRatio||1,1.5);[[bg,bc],[fx,fc]].forEach(([cv,c])=>{cv.width=innerWidth*DPR;cv.height=H()*DPR;c.setTransform(DPR,0,0,DPR,0,0)});
   sizeStage()}
 function sizeStage(){const wrap=$id("stageWrap"),info=document.querySelector(".info");if(!wrap||$id("rollView").hidden)return;
   const avail=wrap.clientHeight-info.offsetHeight-14,size=Math.max(150,Math.min(wrap.clientWidth-8,avail,420));
   stage.style.width=size+"px";stage.style.height=size+"px";const d=Math.min(devicePixelRatio||1,2.5);stage.width=Math.round(size*d);stage.height=stage.width;placeVeil()}
 try{new ResizeObserver(()=>sizeStage()).observe(document.querySelector("main"))}catch(e){}
 addEventListener("resize",fit);
-const W=()=>innerWidth,H=()=>innerHeight;
+const W=()=>innerWidth;
 function dialC(){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}
-function placeVeil(){const d=dialC(),root=document.documentElement.style;root.setProperty("--bigY",Math.max(46,d.y-d.r-78)+"px");root.setProperty("--bigB",Math.max(0,innerHeight-Math.max(d.y-d.r+4,Math.min(124,innerHeight*.17)+8))+"px");root.setProperty("--dx",d.x+"px");root.setProperty("--dy",d.y+"px");root.setProperty("--dr",Math.max(90,d.r*.95)+"px")}
+function placeVeil(){const d=dialC(),root=document.documentElement.style;root.setProperty("--bigY",Math.max(46,d.y-d.r-78)+"px");root.setProperty("--bigB",Math.max(0,H()-Math.max(d.y-d.r+4,Math.min(124,H()*.17)+8))+"px");root.setProperty("--dx",d.x+"px");root.setProperty("--dy",d.y+"px");root.setProperty("--dr",Math.max(90,d.r*.95)+"px")}
 
 /* ================= RANK OUTLINE ================= */
 // Ranks draw as a glowing outline traced around the key's silhouette, with light running around it.
@@ -1228,7 +1235,7 @@ function drawFx(){
 }
 const bigEl=$id("big"),bigName=$id("bigName"),bigSub=$id("bigSub");
 function bigText(txt,col,sub){bigName.textContent=txt;bigName.style.color=col||"#fff";bigSub.textContent=sub||"";bigEl.classList.add("on");bigName.classList.remove("slam","tick","gold","rainbow");fitBig();void bigName.offsetWidth;bigName.classList.add("slam")}
-function fitBig(){bigName.style.fontSize="";const mx=W()-28,w=bigName.scrollWidth;if(w>mx)bigName.style.fontSize=(parseFloat(getComputedStyle(bigName).fontSize)*mx/w)+"px";bigEl.style.bottom="";const r=bigEl.getBoundingClientRect(),pad=10;if(r.top<pad)bigEl.style.bottom=(innerHeight-r.bottom-(pad-r.top))+"px"}
+function fitBig(){bigName.style.fontSize="";const mx=W()-28,w=bigName.scrollWidth;if(w>mx)bigName.style.fontSize=(parseFloat(getComputedStyle(bigName).fontSize)*mx/w)+"px";bigEl.style.bottom="";const r=bigEl.getBoundingClientRect(),pad=10;if(r.top<pad)bigEl.style.bottom=(H()-r.bottom-(pad-r.top))+"px"}
 function bigOff(){bigEl.classList.remove("on");$id("ribbon").classList.remove("on")}
 function ribbon(c1,c2,rb){const r=$id("ribbon");r.style.setProperty("--r1",c1);r.style.setProperty("--r2",c2||"rgba(20,10,0,.55)");r.classList.toggle("rb",!!rb);const br=bigEl.getBoundingClientRect();r.style.top=(br.top+br.height/2-61)+"px";r.classList.remove("on");void r.offsetWidth;r.classList.add("on")}
 function toast(msg){const t=$id("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),1700)}
@@ -2502,7 +2509,7 @@ $id("nameIn").addEventListener("keydown",e=>{if(e.key==="Enter")$id("nameSave").
 
 /* ================= INTRO ================= */
 function playIntro(){const el=$id("intro");if(!el)return;const cv=$id("inCv"),c=cv.getContext("2d"),dpr=Math.min(devicePixelRatio||1,2);let w=0,h=0;
-  const rs=()=>{w=innerWidth;h=innerHeight;cv.width=w*dpr;cv.height=h*dpr};rs();addEventListener("resize",rs);
+  const rs=()=>{w=innerWidth;h=H();cv.width=w*dpr;cv.height=h*dpr};rs();addEventListener("resize",rs);
   const t0=performance.now(),P=[];let done=false,boomed=false,tb=-1;const cl=v=>Math.max(0,Math.min(1,v)),eo=v=>1-Math.pow(1-v,3),eb=v=>{const k=1.7;v-=1;return v*v*((k+1)*v+k)+1};
   const fin=()=>{if(done)return;done=true;el.classList.add("out");setTimeout(()=>{el.remove();removeEventListener("resize",rs)},520)};
   setTimeout(()=>el.classList.add("t"),650);
