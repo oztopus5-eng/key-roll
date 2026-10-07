@@ -2361,7 +2361,7 @@ function rollChest(ti,L,B){const n=[1,1,2,2,3,3][ti],maxKeys=ti>=4?2:1,out=[];le
   }
   if(ti>=2&&!out.some(x=>x.type==="key")&&Math.random()<.4)out[0]={type:"key",ref:rollTier(L,B)};
   if(ti>=4&&Math.random()<(ti===5?.08:.03))out.push({type:"asc",n:1});
-  out.push({type:"gems",n:[1,1,2,3,4,6][ti]+Math.floor(Math.random()*(1+ti))});
+  if(Math.random()<[.2,.25,.3,.35,.4,.5][ti])out.push({type:"gems",n:1+(ti>=3&&Math.random()<.5?1:0)+(ti===5?1:0)});
   if(Math.random()<collVal("nature")/100)out.push(Math.random()<.5?{type:"key",ref:rollTier(L,B)}:{type:"charge",n:1+(ti>>1)});
   return out}
 function applyLoot(it){
@@ -2604,10 +2604,11 @@ function openPlayer(d,ix){const box=$id("pBody");box.innerHTML="";const cleanI=(
   gOpen("pSheet")}
 $id("pBg").onclick=()=>gClose("pSheet");$id("pX").onclick=()=>gClose("pSheet");
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.0.2";
+const VERSION="2.0.3";
 const NOTES=[
+ {v:"2.0.3",d:"Oct 6, 2026",i:["Gems are much rarer: not every chest has them, and they come 1–3 at a time"]},
  {v:"2.0.2",d:"Oct 6, 2026",i:["Rebalanced rare boosters: rare, but findable","Golden Aura from Iron chests up, Mega Charge from Golden up, Godly Charm from Crystal up"]},
- {v:"2.0",d:"Oct 6, 2026",i:["Brand new Clash-style chests","Gems: earn them from every chest","Transcend: spend 30 gems on a Celestial key to unlock that element's Collection IV","Rare boosters: Golden Aura ×3, Mega Charge ×5, Godly Charm ×10","All luck stacks: Storm ×25 + a ×2 booster = ×50","New leaderboard: tap anyone to see their profile","Patch notes + automatic updates","Fixed chests disappearing and the lag crash"]},
+ {v:"2.0",d:"Oct 6, 2026",i:["Brand new Clash-style chests","Gems: find them in chests","Transcend: spend 30 gems on a Celestial key to unlock that element's Collection IV","Rare boosters: Golden Aura ×3, Mega Charge ×5, Godly Charm ×10","All luck stacks: Storm ×25 + a ×2 booster = ×50","New leaderboard: tap anyone to see their profile","Patch notes + automatic updates","Fixed chests disappearing and the lag crash"]},
  {v:"1.9",d:"Oct 6, 2026",i:["Key Roll is on its own site: add it to your home screen","Intro with sound","Cloud saves + save codes","Full-screen layout, no more zooming"]},
  {v:"1.8",d:"Oct 6, 2026",i:["Ascendant Key: get it to Celestial for Collection IV everywhere","Tap a key twice to equip it"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
