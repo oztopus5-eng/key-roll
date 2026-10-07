@@ -1005,8 +1005,10 @@ function $id(x){return document.getElementById(x)}
 
 let APPH=0;function H(){return APPH||innerHeight}
 function fixVH(){let sa=false;try{sa=navigator.standalone===true||matchMedia("(display-mode: standalone)").matches}catch(e){}
-  if(!sa){APPH=0;document.body.classList.remove("sa");return}const port=innerWidth<innerHeight,sh=port?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height);
-  APPH=Math.max(innerHeight,sh);document.documentElement.style.setProperty("--appH",APPH+"px");document.body.classList.add("sa")}
+  if(!sa){APPH=0;document.body.classList.remove("sa");return}
+  const pr=document.createElement("div");pr.style.cssText="position:fixed;left:0;top:0;width:1px;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px)";document.body.appendChild(pr);const it=pr.offsetHeight||0;pr.remove();
+  const port=innerWidth<innerHeight,sh=port?Math.max(screen.width,screen.height):Math.min(screen.width,screen.height),ih=Math.max(innerHeight,document.documentElement.clientHeight||0);
+  APPH=(it>0&&ih+it<=sh+2)?ih+it:ih;document.documentElement.style.setProperty("--appH",APPH+"px");document.body.classList.add("sa")}
 fixVH();addEventListener("resize",fixVH);addEventListener("orientationchange",()=>setTimeout(()=>{fixVH();try{fit()}catch(e){}},300));
 document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
