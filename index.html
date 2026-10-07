@@ -501,12 +501,12 @@ header .logo{cursor:pointer}
 .eqslots.swapping .eqslot:nth-child(2){animation-delay:-.1s}.eqslots.swapping .eqslot:nth-child(3){animation-delay:-.2s}
 @keyframes wig{from{transform:rotate(-2.5deg) scale(1.02)}to{transform:rotate(2.5deg) scale(1.02)}}
 .eqbox.swapmode .eqhead>span:first-child::after{content:" · tap one to swap";color:#ffd66b;letter-spacing:.04em;text-transform:none;font-family:var(--body)}
-.view.inR{animation:tabInR .36s cubic-bezier(.2,.9,.25,1) both}
-.view.inL{animation:tabInL .36s cubic-bezier(.2,.9,.25,1) both}
+.view.inR{animation:tabInR .26s cubic-bezier(.2,.9,.25,1) both}
+.view.inL{animation:tabInL .26s cubic-bezier(.2,.9,.25,1) both}
 .view.outR{animation:tabOutR .24s cubic-bezier(.5,0,.8,.5) forwards;pointer-events:none}
 .view.outL{animation:tabOutL .24s cubic-bezier(.5,0,.8,.5) forwards;pointer-events:none}
-@keyframes tabInR{from{opacity:0;transform:translate3d(70%,0,0) scale(.92)}60%{opacity:1}to{opacity:1;transform:none}}
-@keyframes tabInL{from{opacity:0;transform:translate3d(-70%,0,0) scale(.92)}60%{opacity:1}to{opacity:1;transform:none}}
+@keyframes tabInR{from{opacity:0;transform:translate3d(32%,0,0) scale(.96)}to{opacity:1;transform:none}}
+@keyframes tabInL{from{opacity:0;transform:translate3d(-32%,0,0) scale(.96)}to{opacity:1;transform:none}}
 @keyframes tabOutR{to{opacity:0;transform:translate3d(-55%,0,0) scale(.9)}}
 @keyframes tabOutL{to{opacity:0;transform:translate3d(55%,0,0) scale(.9)}}
 main{overflow:hidden}
@@ -563,6 +563,7 @@ main{overflow:hidden}
 #cpBody.anim .cpk{animation:stag .4s cubic-bezier(.2,1.4,.4,1) both}
 .cpk canvas{width:36px;height:36px}.cpk span{font:700 9.5px var(--display);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.cpk.lock span{color:#4f4868}
 .cpk.tr{border-color:#ffd54a}.cpk em{position:absolute;top:2px;right:4px;font-style:normal;color:#ffd54a;font-size:11px}
+.ablbar.three .ablslot{padding:0 6px 0 4px;gap:4px}.ablbar.three .ablslot span{font-size:9.5px}
 </style>
 
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -1193,7 +1194,9 @@ function sizeStage(){const wrap=$id("stageWrap"),info=document.querySelector(".i
 try{new ResizeObserver(()=>sizeStage()).observe(document.querySelector("main"))}catch(e){}
 addEventListener("resize",fit);
 const W=()=>innerWidth;
-function dialC(){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}
+function dialC(){const mn=stage.closest("main");if(!mn||!stage.offsetWidth){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}
+  const m=mn.getBoundingClientRect();let x=0,y=0,e=stage;while(e&&e!==mn){x+=e.offsetLeft;y+=e.offsetTop;const p=e.offsetParent;if(p&&p!==mn){x-=p.scrollLeft;y-=p.scrollTop}e=p}
+  if(e!==mn){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}y-=mn.scrollTop;const w=stage.offsetWidth,hh=stage.offsetHeight;return{x:m.left+x+w/2,y:m.top+y+hh/2,r:w/2}}
 function placeVeil(){const d=dialC(),root=document.documentElement.style;root.setProperty("--bigY",Math.max(46,d.y-d.r-78)+"px");root.setProperty("--bigB",Math.max(0,H()-Math.max(d.y-d.r+4,Math.min(124,H()*.17)+8))+"px");root.setProperty("--dx",d.x+"px");root.setProperty("--dy",d.y+"px");root.setProperty("--dr",Math.max(90,d.r*.95)+"px")}
 
 /* ================= RANK OUTLINE ================= */
@@ -1636,7 +1639,7 @@ function drawTheme(){if(!theme)return;const th=theme,e=T-th.t0,w=W(),h=H(),out=e
 }
 
 /* ================= ABILITIES (from chests; equip to use) ================= */
-const ROLLABL=["charge","clover","dice","ltix","mtix","surge","twin","echo","floor","siphon"],MAXAB=2;
+const ROLLABL=["charge","clover","dice","ltix","mtix","surge","twin","echo","floor","siphon"];function ablN(){return 2+(collVal("metal")>=5?1:0)}
 function invInit(){if(!Array.isArray(S.inv))S.inv=[];{const old=S.inv;S.inv=[];old.forEach(x=>addInv(x,true))}S.inv=S.inv.filter(x=>x.type!=="star"&&x.type!=="copier");if(!Array.isArray(S.abl))S.abl=[null,null];
   // migrate old auto-active boosts into the inventory
   if(S.charges>0){addInv({type:"charge",n:S.charges});S.charges=0}if(S.ltix>0){addInv({type:"ltix",n:S.ltix});S.ltix=0}if(S.mtix>0){addInv({type:"mtix",n:S.mtix});S.mtix=0}
@@ -1663,8 +1666,8 @@ function ablInfo(it){const n=it.n;switch(it.type){
   case"star":return{col:"#fff27a",t:"Rank Star",d:"+1 rank to a key · ×"+n};
   case"copier":return{col:"#9ef0ff",t:"Key Copy",d:"+1 copy of a key · ×"+n}}}
 function ablIcon(it,px){const cv=document.createElement("canvas");cv.width=cv.height=px*2;const c=cv.getContext("2d");c.translate(px,px*1.06);lootIcon(c,it,px*2*1.3,ablInfo(it).col);return cv}
-function renderAblBar(){const bar=$id("ablBar");if(!bar)return;bar.innerHTML="";
-  for(let k=0;k<MAXAB;k++){const it=S.abl[k],b=document.createElement("button");b.className="ablslot"+(it?"":" empty");
+function renderAblBar(){const bar=$id("ablBar");if(!bar)return;bar.innerHTML="";const AN=ablN();while(S.abl.length<AN)S.abl.push(null);bar.style.gridTemplateColumns="repeat("+AN+",minmax(0,1fr))";bar.classList.toggle("three",AN>2);
+  for(let k=0;k<AN;k++){const it=S.abl[k],b=document.createElement("button");b.className="ablslot"+(it?"":" empty");
     if(it){const inf=ablInfo(it);b.style.setProperty("--ac",inf.col);b.appendChild(ablIcon(it,15));const s=document.createElement("span");s.textContent=inf.t;const n=document.createElement("b");n.textContent="×"+it.n;b.append(s,n)}
     else{b.innerHTML='<i>+</i><span>Ability</span>'}
     b.onclick=()=>openAbl();bar.appendChild(b)}
@@ -1677,8 +1680,8 @@ function openAbl(){if(busy)return;const sh=$id("abSheet"),L=$id("abList");L.inne
       const i=document.createElement("button");i.className="abi";i.textContent="i";i.setAttribute("aria-label","About "+inf.t);i.onclick=e=>{e.stopPropagation();showTip(b,inf)};b.appendChild(i)}
     else b.innerHTML='<span class="abplus">+</span>';
     b.onclick=onTap;return b};
-  sec("Equipped");const er=document.createElement("div");er.className="abgrid eqg";
-  for(let k=0;k<MAXAB;k++){const it=S.abl[k];er.appendChild(box(it,true,()=>{if(!it)return;S.abl[k]=null;addInv(it,true);save();renderAblBar();updLuck();osc(500,.12,"triangle",.05,0,250);openAbl()}))}L.appendChild(er);
+  sec("Equipped");const er=document.createElement("div");er.className="abgrid eqg";const AN=ablN();er.style.gridTemplateColumns="repeat("+AN+",minmax(0,1fr))";while(S.abl.length<AN)S.abl.push(null);
+  for(let k=0;k<AN;k++){const it=S.abl[k];er.appendChild(box(it,true,()=>{if(!it)return;S.abl[k]=null;addInv(it,true);save();renderAblBar();updLuck();osc(500,.12,"triangle",.05,0,250);openAbl()}))}L.appendChild(er);
   sec("Inventory");
   if(!S.inv.length){const e=document.createElement("div");e.className="abempty";e.textContent="Open chests to find abilities";L.appendChild(e)}
   else{const g=document.createElement("div");g.className="abgrid";S.inv.forEach(it=>g.appendChild(box(it,false,()=>equipAbl(it))));L.appendChild(g)}
@@ -1688,7 +1691,7 @@ function showTip(b,inf){const L=$id("abList");if(abTip){abTip.remove();if(abTip.
   setTimeout(()=>{const off=e=>{if(abTip&&!(e.target.classList&&e.target.classList.contains("abi"))){abTip.remove();abTip=null;tipClosed=performance.now()}removeEventListener("pointerdown",off,true)};addEventListener("pointerdown",off,true)},0);const lr=L.getBoundingClientRect(),br=b.getBoundingClientRect();t.style.top=(br.bottom-lr.top+L.scrollTop+6)+"px";t.style.left=Math.max(4,Math.min(lr.width-214,br.left-lr.left+br.width/2-105))+"px";L.appendChild(t);abTip=t;SFX.pop()}
 function closeAbl(e){if(e&&performance.now()-tipClosed<500)return;const sh=$id("abSheet");sh.classList.remove("on");setTimeout(()=>{if(!sh.classList.contains("on"))sh.hidden=true},200)}
 function equipAbl(it){let k=S.abl.findIndex(x=>sameAb(x,it));if(k>=0){S.abl[k].n+=it.n;if(it.v!=null)S.abl[k].v=Math.max(S.abl[k].v||0,it.v);S.inv.splice(S.inv.indexOf(it),1);save();renderAblBar();updLuck();openAbl();SFX.bell([79,83,86],.05);return}
-  k=S.abl.findIndex(x=>!x);if(k<0){const o=S.abl[0];S.abl[0]=S.abl[1];S.abl[1]=null;addInv(o,true);k=1}
+  {const AN=ablN();while(S.abl.length<AN)S.abl.push(null);k=S.abl.findIndex((x,i)=>!x&&i<AN);if(k<0){const o=S.abl[0];S.abl.splice(0,1);S.abl.splice(AN-1,0,null);addInv(o,true);k=AN-1}}
   S.inv.splice(S.inv.indexOf(it),1);S.abl[k]=it;save();renderAblBar();updLuck();openAbl();
   const inf=ablInfo(it);SFX.bell([79,83,86],.05);vib(20);
   const el=$id("abList").querySelectorAll(".eqg .abox")[k];if(el){const r=el.getBoundingClientRect();boom(24,[inf.col,"#fff"],5,r.left+r.width/2,r.top+r.height/2);el.classList.add("pop")}
@@ -1724,16 +1727,16 @@ function useAblSlot(type){const k=S.abl.findIndex(x=>x&&x.type===type&&x.n>0);re
 function spendAbl(k){const it=S.abl[k];it.n--;if(it.n<=0){S.abl[k]=null;setTimeout(()=>toast(ablInfo({...it,n:0}).t+" used up"),900)}}
 /* ================= ELEMENT COLLECTIONS (permanent boosts) ================= */
 const COLL=[
- {el:"fire",n:"Inferno",ic:"🔥",d:v=>"+"+v+"% luck",v:[4,8,15,40]},
- {el:"frost",n:"Permafrost",ic:"❄️",d:v=>"rank-up misses build ×"+v,v:[1.5,2,2.5,4]},
- {el:"storm",n:"Stormcaller",ic:"⚡",d:v=>"+"+v+"% storm charge",v:[10,25,50,150]},
- {el:"water",n:"Tidal",ic:"💧",d:v=>v+"% chance of an extra copy",v:[4,8,15,35]},
- {el:"nature",n:"Wildbloom",ic:"🌿",d:v=>v+"% chance of a bonus chest item",v:[15,30,60,100]},
- {el:"gem",n:"Gemcutter",ic:"💎",d:v=>"+"+v+"% rank-up",v:[5,12,25,60]},
- {el:"cosmic",n:"Starborn",ic:"🌌",d:v=>"+"+v+" Mega luck",v:[3,6,12,30]},
- {el:"shadow",n:"Voidwalker",ic:"🌑",d:v=>v+"% chance of a ×10 Shadow roll",v:[2,4,7,15]},
- {el:"gold",n:"Midas",ic:"🪙",d:v=>"+"+v+"% chest luck",v:[15,30,60,150]},
- {el:"metal",n:"Clockwork",ic:"⚙️",d:v=>"Lucky rolls "+v+" sooner",v:[1,1,2,4]}];
+ {el:"fire",n:"Inferno",ic:"🔥",d:v=>"+"+v+"% luck",v:[4,8,15,75]},
+ {el:"frost",n:"Permafrost",ic:"❄️",d:v=>"rank-up misses build ×"+v,v:[1.5,2,2.5,6]},
+ {el:"storm",n:"Stormcaller",ic:"⚡",d:v=>"+"+v+"% storm charge",v:[10,25,50,250]},
+ {el:"water",n:"Tidal",ic:"💧",d:v=>v+"% chance of an extra copy",v:[4,8,15,60]},
+ {el:"nature",n:"Wildbloom",ic:"🌿",d:v=>v>=100?(v/100)+" bonus chest item"+(v>100?"s":"")+" in every chest":v+"% chance of a bonus chest item",v:[15,30,60,200]},
+ {el:"gem",n:"Gemcutter",ic:"💎",d:v=>"+"+v+"% rank-up",v:[5,12,25,100]},
+ {el:"cosmic",n:"Starborn",ic:"🌌",d:v=>"+"+v+" Mega luck",v:[3,6,12,50]},
+ {el:"shadow",n:"Voidwalker",ic:"🌑",d:v=>v+"% chance of a ×10 Shadow roll",v:[2,4,7,25]},
+ {el:"gold",n:"Midas",ic:"🪙",d:v=>"+"+v+"% chest luck",v:[15,30,60,300]},
+ {el:"metal",n:"Clockwork",ic:"⚙️",d:v=>v>=5?"+1 ability slot · Lucky rolls "+v+" sooner":"Lucky rolls "+v+" sooner",v:[1,1,2,5]}];
 const TCOST=30;function isTrans(i){return typeof i==="number"&&!!(S.trans&&S.trans[i])}
 function transEl(el){if(!S.trans)return false;for(const k in S.trans)if(S.trans[k]&&collEl(+k)===el)return true;return false}
 const collEl=i=>{const e=elemIdx(i);return e==="time"?"metal":e};
@@ -2509,7 +2512,7 @@ function rollChest(ti,L,B){const n=[1,1,2,2,3,3][ti],maxKeys=ti>=4?2:1,out=[];le
   if(ti>=2&&!out.some(x=>x.type==="key")&&Math.random()<.4)out[0]={type:"key",ref:rollTier(L,B)};
   if(ti>=4&&Math.random()<(ti===5?.08:.03))out.push({type:"asc",n:1});
   if(Math.random()<[.1,.12,.15,.18,.22,.28][ti])out.push({type:"gems",n:ti===5&&Math.random()<.3?2:1});
-  if(Math.random()<collVal("nature")/100)out.push(Math.random()<.5?{type:"key",ref:rollTier(L,B)}:{type:"charge",n:1+(ti>>1)});
+  for(let nv=collVal("nature")/100;nv>0;nv-=1)if(Math.random()<nv)out.push(Math.random()<.5?{type:"key",ref:rollTier(L,B)}:{type:"charge",n:1+(ti>>1)});
   return out}
 function applyLoot(it){
   if(it.type==="key"){it.isNew=!S.counts[it.ref]&&!(S.seen&&S.seen[it.ref]);S.counts[it.ref]=(S.counts[it.ref]||0)+1;if(it.ref>S.best)S.best=it.ref}
@@ -2685,9 +2688,9 @@ document.querySelectorAll("nav .tab").forEach(b=>b.onclick=()=>{
   osc(dir==="R"?520:440,.12,"sine",.05,0,dir==="R"?880:330);noise(.18,.06,dir==="R"?600:3000,dir==="R"?3000:600,0,"bandpass",2);osc(midi(84+VIEWS.indexOf(to)*2),.18,"triangle",.035,.05);vib(8);
   const r=b.getBoundingClientRect();for(let k=0;k<12;k++){const a=-Math.PI/2+(Math.random()-.5)*2.4,sp=1.5+Math.random()*3;parts.push({x:r.left+r.width/2,y:r.top+r.height*.4,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dec:.04,col:k%2?"#fff":GOLD,sz:1.4+Math.random()*1.6,g:.05,sh:"star"})}
   clearTimeout(navT);VIEWS.forEach(v=>{const el=$id(v);el.classList.remove("inR","inL","outR","outL");if(v!==curView&&v!==to)el.hidden=true});
-  from.classList.add("out"+dir);
+  from.hidden=true;
   nv.hidden=false;nv.classList.add("in"+dir);
-  navT=setTimeout(()=>{from.hidden=true;from.classList.remove("outR","outL");nv.classList.remove("inR","inL")},370);
+  navT=setTimeout(()=>{nv.classList.remove("inR","inL");try{placeVeil()}catch(e){}},300);
   curView=to;let stag=true;
   if(to==="rollView"){updLuck();shown=S.hat;setInfo(shown,"",false);requestAnimationFrame(()=>{fit();dialV=9;pulse=1;const d=dialC();ring(GOLD,5,3,d.x,d.y)})}
   if(to==="colView"&&!renderCol())stag=false;
@@ -2796,8 +2799,10 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.2";
+const VERSION="2.3";
 const NOTES=[
+ {v:"2.3",d:"Oct 6, 2026",i:["Clockwork IV now gives you a 3rd ability slot","Every Stage IV perk is much stronger: Inferno +75% luck, Permafrost ×6, Stormcaller +250%, Tidal 60%, Wildbloom 2 bonus items per chest, Gemcutter +100% rank-up, Starborn +50 Mega luck, Voidwalker 25%, Midas +300% chest luck"]},
+ {v:"2.2.1",d:"Oct 6, 2026",i:["Fixed the light sitting on the left side of the screen","Faster tab switching, no more two tabs at once"]},
  {v:"2.2",d:"Oct 6, 2026",i:["Collection pages: tap a collection to see every stage and upgrade it","Swapping keys: tap a key, then tap the slot to swap. Tap anywhere else to cancel","Tap an equipped key twice to unequip it","Chests open on a hinge and the key spins in 3D","Smoother tab switching","Rarity build-up shows the rarity climbing instead of random words","Cleaner top bar: rolls and best moved to your profile in Leaders","Gems are rarer, and you always see exactly how many you got"]},
  {v:"2.1",d:"Oct 6, 2026",i:["Feedback board: post ideas and bugs, like and comment on other people's posts","Gem rewards now show the exact number of gems you get"]},
  {v:"2.0.3",d:"Oct 6, 2026",i:["Gems are much rarer: not every chest has them, and they come 1–3 at a time"]},
