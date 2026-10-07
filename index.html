@@ -471,6 +471,25 @@ header .logo{cursor:pointer}
 .fbtn.trans:disabled{filter:grayscale(.7) brightness(.7)}
 .shnote.trans{background:linear-gradient(90deg,#ff6ad5,#ffd54a,#7ae7ff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
 .card .rk.tr{background:linear-gradient(90deg,#ff6ad5,#ffd54a,#7ae7ff,#b49aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.gsheet.tall .shcard{max-height:92%;min-height:70%}
+.fbbtn{display:flex;align-items:center;justify-content:space-between;width:100%;margin:2px 0 10px;padding:12px 14px;border-radius:14px;border:1px solid rgba(122,231,255,.35);background:linear-gradient(90deg,rgba(122,231,255,.12),rgba(180,154,255,.1));color:#dff6ff;font:800 14px var(--body);cursor:pointer}
+.fbbtn span{font:700 11px var(--body);color:#8fa3c8}
+.fcomp{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px}
+.fcomp textarea{width:100%;box-sizing:border-box;resize:none;font:600 14px var(--body);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;user-select:text;-webkit-user-select:text}
+.fcomp textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+.fcomp .fbtn{align-self:flex-end;padding:9px 22px}
+.fpost{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-top:8px}
+.fph{display:flex;align-items:baseline;gap:8px}.fph b{font:800 13px var(--body);color:var(--gold)}.fph span{font-size:11px;color:var(--mute)}
+.fdel{margin-left:auto;background:none;border:0;color:#8a6a7a;font:700 11px var(--body);cursor:pointer}
+.fpt{font-size:14px;line-height:1.4;color:#efe8ff;margin:5px 0 8px;white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
+.fpa{display:flex;gap:8px}
+.flike,.fcom{background:rgba(10,8,20,.6);border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:#d8d0ee;font:800 12px var(--body);cursor:pointer}
+.flike.on{border-color:#ff6a8a;color:#ffb3c4;background:rgba(255,80,120,.12)}
+.fcbox{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.fc{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;padding:5px 0;font-size:13px;color:#e4dcf6}.fc b{color:#9fd8ff;font-size:12px}.fc span{flex:1 1 60%;word-break:break-word;user-select:text;-webkit-user-select:text}.fc i{font-style:normal;font-size:10px;color:var(--mute)}
+.fc .fdel{margin-left:0}
+.fcrow{display:flex;gap:6px;margin-top:6px}.fcrow input{box-sizing:border-box;flex:1;min-width:0;font:600 13px var(--body);background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;user-select:text;-webkit-user-select:text}
 </style>
 
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -515,6 +534,7 @@ header .logo{cursor:pointer}
       <h2>Leaderboard <span class="myw" id="myWorth"></span></h2><div class="seg" id="lbSeg"><button data-m="best">Rarest</button><button data-m="worth">Worth</button></div>
       <div class="namebox"><input id="nameIn" maxlength="16" placeholder="Your name on the board" autocomplete="off"><button class="ghost" id="nameSave">Save</button></div>
       <div class="note" id="lbNote"></div>
+      <button class="fbbtn" id="fbBtn">💬 Feedback board<span>ideas · bugs · likes</span></button>
       <div class="bkrow"><button class="ghost" id="bkExp">Copy save code</button><button class="ghost" id="bkImp">Load save code</button></div>
       <div class="lb" id="lb"></div>
       <button class="verbtn" id="verBtn"></button>
@@ -534,6 +554,9 @@ header .logo{cursor:pointer}
 <div id="stSheet" hidden><div class="shbg" id="stBg"></div><div class="shcard ab st" role="dialog" aria-modal="true"><button class="shx" id="stX" aria-label="Close">✕</button><div class="abtitle st">⚡ Feed the Storm</div><div class="stlv" id="stLv"></div><div class="sbar big"><i id="stFill"></i><span id="stPct"></span></div><div class="abgrid st" id="stGrid"></div></div></div>
 <div id="pSheet" class="gsheet" hidden><div class="shbg" id="pBg"></div><div class="shcard" role="dialog" aria-modal="true"><button class="shx" id="pX" aria-label="Close">✕</button><div id="pBody"></div></div></div>
 <div id="nSheet" class="gsheet" hidden><div class="shbg" id="nBg"></div><div class="shcard" role="dialog" aria-modal="true"><button class="shx" id="nX" aria-label="Close">✕</button><div class="abtitle">What's new</div><div id="nBody"></div></div></div>
+<div id="fSheet" class="gsheet tall" hidden><div class="shbg" id="fBg"></div><div class="shcard" role="dialog" aria-modal="true"><button class="shx" id="fX" aria-label="Close">✕</button><div class="abtitle">Feedback</div>
+<div class="fcomp"><textarea id="fText" maxlength="500" rows="3" placeholder="Ideas, bugs, anything…"></textarea><button class="fbtn" id="fPost">POST</button></div>
+<div class="seg" id="fSeg"><button data-m="top">Top</button><button data-m="new">New</button></div><div id="fList"></div></div></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="flash"></div>
 <div id="ribbonClip"><div id="ribbon"></div></div>
@@ -2372,7 +2395,7 @@ function applyLoot(it){
 function lootInfo(it){switch(it.type){
   case"key":return{col:tierCSS(it.ref),l1:keyName(it.ref),l2:TIER_NAMES[it.ref]};
   case"asc":return{col:"#fff3b0",l1:"Ascendant Key",l2:"!!!"};
-  case"gems":return{col:"#7af0ff",l1:"+"+it.n+" Gems",l2:"for Transcending"};
+  case"gems":return{col:"#7af0ff",l1:"+"+it.n+" Gem"+(it.n>1?"s":""),l2:"for Transcending"};
   case"charge":return{col:"#ffd54a",l1:"+"+it.n+" Boosted rolls",l2:"×2 luck"};
   case"surge":return{col:ELCOL.gem,l1:"Rank Surge",l2:"rank-up ×1.5"};
   case"ltix":return{col:"#7dffa8",l1:(it.n>1?it.n+"× ":"")+"Lucky Ticket",l2:"next roll Lucky"};
@@ -2419,7 +2442,7 @@ function lootIcon(c,it,w,col){const OL="#170b04",lw=w*.035;c.save();c.lineJoin="
     c.fillStyle="#fff";c.font=`400 ${w*.2}px 'Luckiest Guy',Impact,sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineWidth=lw*1.6;c.strokeStyle=OL;c.strokeText(L,0,w*.02);c.fillText(L,0,w*.02);shine(-w*.1,-w*.16,w*.07,w*.03);break}
   case"gems":{const D=(x,y,s2)=>{c.save();c.translate(x,y);c.beginPath();c.moveTo(-s2*.5,-s2*.15);c.lineTo(-s2*.25,-s2*.45);c.lineTo(s2*.25,-s2*.45);c.lineTo(s2*.5,-s2*.15);c.lineTo(0,s2*.5);c.closePath();const g=c.createLinearGradient(0,-s2*.45,0,s2*.5);g.addColorStop(0,"#e6fdff");g.addColorStop(.5,"#7af0ff");g.addColorStop(1,"#1a8ac8");c.fillStyle=g;c.fill();out();
       c.beginPath();c.moveTo(-s2*.5,-s2*.15);c.lineTo(s2*.5,-s2*.15);c.moveTo(-s2*.25,-s2*.45);c.lineTo(-s2*.1,-s2*.15);c.lineTo(0,s2*.5);c.lineTo(s2*.1,-s2*.15);c.lineTo(s2*.25,-s2*.45);c.strokeStyle="rgba(10,40,70,.5)";c.lineWidth=lw*.6;c.stroke();shine(-s2*.18,-s2*.28,s2*.1,s2*.04,0);c.restore()};
-    D(-w*.13,w*.06,w*.3);D(w*.14,w*.08,w*.26);D(0,-w*.08,w*.36);break}
+    {const n=Math.max(1,Math.min(3,it.n|0));if(n===1)D(0,0,w*.42);else if(n===2){D(-w*.12,w*.04,w*.32);D(w*.12,-w*.02,w*.34)}else{D(-w*.13,w*.06,w*.3);D(w*.14,w*.08,w*.26);D(0,-w*.08,w*.36)}}break}
   case"siphon":{rr(c,-w*.14,-w*.26,w*.28,w*.5,w*.06);c.fillStyle="#0e1638";c.fill();c.beginPath();rr(c,-w*.14,-w*.26,w*.28,w*.5,w*.06);out();c.fillStyle="#8ad8ff";c.fillRect(-w*.06,-w*.32,w*.12,w*.06);
     const g=c.createLinearGradient(0,w*.2,0,-w*.1);g.addColorStop(0,"#2a5bd8");g.addColorStop(1,"#bfe9ff");c.fillStyle=g;rr(c,-w*.1,-w*.06,w*.2,w*.26,w*.03);c.fill();
     c.fillStyle="#fff";c.beginPath();c.moveTo(w*.02,-w*.2);c.lineTo(-w*.06,w*.02);c.lineTo(0,w*.02);c.lineTo(-w*.03,w*.18);c.lineTo(w*.07,-w*.04);c.lineTo(w*.01,-w*.04);c.closePath();c.fill();break}
@@ -2603,9 +2626,44 @@ function openPlayer(d,ix){const box=$id("pBody");box.innerHTML="";const cleanI=(
   if(Array.isArray(d.eq)&&d.eq.length){box.appendChild(el("div","psec","Equipped"));const eg=el("div","peq");d.eq.slice(0,3).forEach((r,k)=>{r=cleanI(r,N);if(r==null)return;const b=el("div","pek");b.appendChild(iconCanvas(r,false,cleanI((d.eqg||[])[k],MAXG+1)??0,40));const n=el("span",null,keyName(r));n.style.color=tierCSS(r);b.appendChild(n);eg.appendChild(b)});box.appendChild(eg)}
   gOpen("pSheet")}
 $id("pBg").onclick=()=>gClose("pSheet");$id("pX").onclick=()=>gClose("pSheet");
+/* ================= FEEDBACK BOARD ================= */
+let fbUnsub=null,fbPosts=[],fbSort="top",fbOpenC=null,fbCUnsub=null,fbLast=0;
+const myName=()=>(S.name||"").slice(0,16)||("Keeper #"+(uid?uid.slice(-4):"????"));
+const ago=t=>{const s2=Math.max(0,(Date.now()-(t||0))/1000);return s2<60?"now":s2<3600?Math.floor(s2/60)+"m":s2<86400?Math.floor(s2/3600)+"h":Math.floor(s2/86400)+"d"};
+function openFeedback(){gOpen("fSheet");renderFeedback();if(!FB||!db){return}
+  if(!fbUnsub){try{fbUnsub=db.collection("feedback").orderBy("at","desc").limit(100).onSnapshot(sn=>{fbPosts=sn.docs.map(x=>Object.assign({id:x.id},x.data()));renderFeedback()},()=>{$id("fList").innerHTML='<div class="note">Couldn\'t load feedback</div>'})}catch(e){}}}
+function closeFeedback(){gClose("fSheet");if(fbCUnsub){fbCUnsub();fbCUnsub=null}fbOpenC=null}
+function renderFeedback(){const L=$id("fList");if(!L)return;document.querySelectorAll("#fSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===fbSort));
+  const off=!FB||!db;$id("fPost").disabled=off;$id("fText").disabled=off;$id("fText").placeholder=off?"Feedback works in the app version":"Ideas, bugs, anything…";
+  if(off){L.innerHTML='<div class="note">Open Key Roll from oztopus5-eng.github.io/key-roll to post and read feedback</div>';return}
+  const keepC=fbOpenC;L.innerHTML="";const list=[...fbPosts];if(fbSort==="top")list.sort((a,b)=>((b.likes||[]).length-(a.likes||[]).length)||((b.at||0)-(a.at||0)));
+  if(!list.length){L.innerHTML='<div class="note">No feedback yet. Be the first!</div>';return}
+  list.forEach(p=>{const card=document.createElement("div");card.className="fpost";
+    const hd=document.createElement("div");hd.className="fph";const nm=document.createElement("b");nm.textContent=String(p.name||"Someone").slice(0,16);const tm=document.createElement("span");tm.textContent=ago(p.at);hd.append(nm,tm);
+    if(p.uid===uid){const del=document.createElement("button");del.className="fdel";del.textContent="Delete";del.onclick=()=>{if(confirm("Delete your post?"))db.collection("feedback").doc(p.id).delete().catch(()=>toast("Couldn't delete"))};hd.appendChild(del)}
+    const tx=document.createElement("div");tx.className="fpt";tx.textContent=String(p.text||"").slice(0,500);
+    const ac=document.createElement("div");ac.className="fpa";const liked=(p.likes||[]).includes(uid);
+    const lb=document.createElement("button");lb.className="flike"+(liked?" on":"");lb.textContent=(liked?"❤️ ":"🤍 ")+(p.likes||[]).length;
+    lb.onclick=()=>{const FV=firebase.firestore.FieldValue;db.collection("feedback").doc(p.id).update({likes:liked?FV.arrayRemove(uid):FV.arrayUnion(uid)}).catch(()=>toast("Couldn't like"));if(!liked){SFX.pop();vib(10)}};
+    const cb=document.createElement("button");cb.className="fcom";cb.textContent="💬 "+(p.cn||0);cb.onclick=()=>toggleComments(p.id,card);
+    ac.append(lb,cb);card.append(hd,tx,ac);L.appendChild(card);if(keepC===p.id)toggleComments(p.id,card,true)})}
+function toggleComments(id,card,force){if(fbCUnsub){fbCUnsub();fbCUnsub=null}const ex=document.querySelector("#fList .fcbox");if(ex)ex.remove();
+  if(fbOpenC===id&&!force){fbOpenC=null;return}fbOpenC=id;const box=document.createElement("div");box.className="fcbox";const list=document.createElement("div");list.className="fclist";list.innerHTML='<div class="note">Loading…</div>';
+  const row=document.createElement("div");row.className="fcrow";const inp=document.createElement("input");inp.maxLength=300;inp.placeholder="Write a comment…";const go=document.createElement("button");go.className="ghost";go.textContent="Send";
+  go.onclick=async()=>{const t=inp.value.trim();if(!t)return;if(Date.now()-fbLast<5000){toast("Slow down a sec");return}fbLast=Date.now();go.disabled=true;
+    try{await db.collection("feedback").doc(id).collection("comments").add({text:t.slice(0,300),name:myName(),uid,at:Date.now()});await db.collection("feedback").doc(id).update({cn:firebase.firestore.FieldValue.increment(1)}).catch(()=>{});inp.value="";SFX.pop()}catch(e){toast("Couldn't send")}go.disabled=false};
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")go.click()});row.append(inp,go);box.append(list,row);card.appendChild(box);
+  try{fbCUnsub=db.collection("feedback").doc(id).collection("comments").orderBy("at","asc").limit(60).onSnapshot(sn=>{list.innerHTML="";if(!sn.docs.length){list.innerHTML='<div class="note">No comments yet</div>';return}
+    sn.docs.forEach(x=>{const c=x.data(),el=document.createElement("div");el.className="fc";const b=document.createElement("b");b.textContent=String(c.name||"Someone").slice(0,16);const sp=document.createElement("span");sp.textContent=String(c.text||"").slice(0,300);const tm=document.createElement("i");tm.textContent=ago(c.at);el.append(b,sp,tm);
+      if(c.uid===uid){const d=document.createElement("button");d.className="fdel";d.textContent="✕";d.onclick=()=>{x.ref.delete().then(()=>db.collection("feedback").doc(id).update({cn:firebase.firestore.FieldValue.increment(-1)}).catch(()=>{})).catch(()=>{})};el.appendChild(d)}list.appendChild(el)})},()=>{list.innerHTML='<div class="note">Couldn\'t load comments</div>'})}catch(e){}}
+$id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db)return;if(Date.now()-fbLast<20000){toast("Wait a few seconds before posting again");return}fbLast=Date.now();$id("fPost").disabled=true;
+  try{await db.collection("feedback").add({text:t.slice(0,500),name:myName(),uid,pid:S.pid,at:Date.now(),likes:[],cn:0});$id("fText").value="";fbSort="new";renderFeedback();toast("Posted! Thanks for the feedback");SFX.bell([79,83,86],.05)}catch(e){toast("Couldn't post. Try again")}$id("fPost").disabled=false};
+document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
+$id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.0.3";
+const VERSION="2.1";
 const NOTES=[
+ {v:"2.1",d:"Oct 6, 2026",i:["Feedback board: post ideas and bugs, like and comment on other people's posts","Gem rewards now show the exact number of gems you get"]},
  {v:"2.0.3",d:"Oct 6, 2026",i:["Gems are much rarer: not every chest has them, and they come 1–3 at a time"]},
  {v:"2.0.2",d:"Oct 6, 2026",i:["Rebalanced rare boosters: rare, but findable","Golden Aura from Iron chests up, Mega Charge from Golden up, Godly Charm from Crystal up"]},
  {v:"2.0",d:"Oct 6, 2026",i:["Brand new Clash-style chests","Gems: find them in chests","Transcend: spend 30 gems on a Celestial key to unlock that element's Collection IV","Rare boosters: Golden Aura ×3, Mega Charge ×5, Godly Charm ×10","All luck stacks: Storm ×25 + a ×2 booster = ×50","New leaderboard: tap anyone to see their profile","Patch notes + automatic updates","Fixed chests disappearing and the lag crash"]},
