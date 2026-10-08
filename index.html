@@ -1812,7 +1812,11 @@ function upDesc(it,lv){const t=it.type;switch(t){case"clover":return"+"+cloverV(
   case"echo":return(echoN(lv)+1)+" copies";case"dice":return"best of "+diceN(lv);case"siphon":return"+"+siphV(it.v,lv)+" storm";default:return"×"+multOf(t,lv)+" luck"}}
 const cloverV=(v,lv)=>Math.round(v*(abStage()>=1?1.25:1)*UPG.clover[lv|0]);const LVN=["","II","III","MAX"];const lvTag=it=>it&&it.lv?" "+LVN[it.lv]:"";
 function abStage(){const n=ABTYPES.filter(t=>S.ablSeen&&S.ablSeen[t]).length;let st=0;[4,8,11,13].forEach(t=>{if(n>=t)st++});return st}
-function addInv(it,noEq){if(it&&it.type&&ABTYPES.includes(it.type)){S.ablSeen=S.ablSeen||{};S.ablSeen[it.type]=1}const o={type:it.type,n:it.n||1};if(it.lv)o.lv=it.lv;if(it.v!=null)o.v=it.v;if(it.el)o.el=it.el;const ex=(!noEq&&S.abl&&S.abl.find(x=>sameAb(x,o)))||S.inv.find(x=>sameAb(x,o));if(ex){ex.n+=o.n;if(o.v!=null)ex.v=Math.max(ex.v||0,o.v)}else S.inv.push(o)}
+function addInv(it,noEq){if(it&&it.type&&ABTYPES.includes(it.type)){S.ablSeen=S.ablSeen||{};S.ablSeen[it.type]=1}const o={type:it.type,n:it.n||1};if(it.lv)o.lv=it.lv;if(UPT.includes(o.type)&&S.ulv&&S.ulv[o.type])o.lv=Math.max(o.lv|0,S.ulv[o.type]);if(it.v!=null)o.v=it.v;if(it.el)o.el=it.el;const ex=(!noEq&&S.abl&&S.abl.find(x=>sameAb(x,o)))||S.inv.find(x=>sameAb(x,o));if(ex){ex.n+=o.n;if(o.v!=null)ex.v=Math.max(ex.v||0,o.v)}else S.inv.push(o)}
+function syncUlv(){S.ulv=S.ulv&&typeof S.ulv==="object"?S.ulv:{};S.inv=S.inv||[];const all=[...S.inv,...(S.abl||[])].filter(x=>x&&UPT.includes(x.type));
+  all.forEach(x=>{if(x.lv)S.ulv[x.type]=Math.min(3,Math.max(S.ulv[x.type]|0,x.lv|0))});all.forEach(x=>{const u=S.ulv[x.type]|0;if(u)x.lv=u});
+  const inv=[];S.inv.forEach(x=>{const e=inv.find(y=>sameAb(y,x));if(e){e.n+=x.n;if(x.v!=null)e.v=Math.max(e.v||0,x.v)}else inv.push(x)});S.inv=inv}
+syncUlv();
 function invCount(type){return S.inv.filter(x=>x.type===type).reduce((s,x)=>s+x.n,0)}
 function takeInv(type){const x=S.inv.find(x=>x.type===type&&x.n>0);if(!x)return false;x.n--;if(x.n<=0)S.inv.splice(S.inv.indexOf(x),1);return true}
 function ablInfo(it){const n=it.n;switch(it.type){
@@ -1863,22 +1867,20 @@ function openAbl(){if(busy)return;const sh=$id("abSheet"),L=$id("abList");L.inne
 function showTip(b,inf){const L=$id("abList");if(abTip){abTip.remove();if(abTip._b===b){abTip=null;return}}
   const t=document.createElement("div");t.className="abtip";t._b=b;t.innerHTML="<b></b><span></span>";t.firstChild.textContent=inf.t;t.firstChild.style.color=inf.col;t.lastChild.textContent=inf.d;
   setTimeout(()=>{const off=e=>{if(abTip&&!(e.target.classList&&e.target.classList.contains("abi"))){abTip.remove();abTip=null;tipClosed=performance.now()}removeEventListener("pointerdown",off,true)};addEventListener("pointerdown",off,true)},0);const lr=L.getBoundingClientRect(),br=b.getBoundingClientRect();t.style.top=(br.bottom-lr.top+L.scrollTop+6)+"px";t.style.left=Math.max(4,Math.min(lr.width-214,br.left-lr.left+br.width/2-105))+"px";L.appendChild(t);abTip=t;SFX.pop()}
-function renderUpg(box){box.innerHTML="";const gems=S.gems||0;
-  const L=[];S.inv.forEach(it=>{if(UPT.includes(it.type))L.push([it,"inv"])});(S.abl||[]).forEach(it=>{if(it&&UPT.includes(it.type))L.push([it,"eq"])});
-  L.sort((a,b)=>UPT.indexOf(a[0].type)-UPT.indexOf(b[0].type)||(a[0].lv|0)-(b[0].lv|0));
+function renderUpg(box){box.innerHTML="";const gems=S.gems||0;S.ulv=S.ulv||{};
+  const L=UPT.filter(t=>haveAb(t)>0||S.ulv[t]);
   if(!L.length){const e=document.createElement("div");e.className="abempty";e.textContent="Open chests to find abilities you can upgrade";box.appendChild(e)}
-  L.forEach(([it,where])=>{const t=it.type,lv=it.lv|0,inf=ablInfo(it),row=document.createElement("div");row.className="uprow"+(lv>=3?" max":"");row.style.setProperty("--ac",inf.col);
-    row.appendChild(ablIcon(it,22));const tx=document.createElement("div");tx.className="uptx";const nm=document.createElement("b");nm.textContent=inf.t+" ×"+it.n+(where==="eq"?" · equipped":"");nm.style.color=inf.col;
+  L.forEach(t=>{const lv=S.ulv[t]|0,src=[...S.inv,...(S.abl||[])].find(x=>x&&x.type===t),it={type:t,n:haveAb(t),lv,v:src&&src.v!=null?src.v:{clover:15,siphon:8}[t]},inf=ablInfo(it),row=document.createElement("div");row.className="uprow"+(lv>=3?" max":"");row.style.setProperty("--ac",inf.col);
+    row.appendChild(ablIcon(it,22));const tx=document.createElement("div");tx.className="uptx";const nm=document.createElement("b");nm.textContent=inf.t+(it.n?" · ×"+it.n:"");nm.style.color=inf.col;
     const cur=upDesc(it,lv),nxt=lv<3?upDesc(it,lv+1):null;
     const ln=document.createElement("span");const a1=document.createElement("em");a1.textContent=cur;ln.appendChild(a1);if(nxt){ln.appendChild(document.createTextNode(" → "));const z=document.createElement("strong");z.textContent=nxt;ln.appendChild(z)}else ln.appendChild(document.createTextNode(" · MAX"));
     const pips=document.createElement("i");pips.className="uppips";for(let q=0;q<3;q++){const d=document.createElement("u");if(q<lv)d.className="on";pips.appendChild(d)}tx.append(nm,ln,pips);row.appendChild(tx);
     const bt=document.createElement("button");bt.className="fbtn upb";if(lv>=3){bt.textContent="MAX";bt.disabled=true}else{const cost=ucost(t,lv);bt.textContent="+1 · 💎"+cost;if(gems<cost)bt.disabled=true;bt.onclick=()=>doUpg(it,row)}row.appendChild(bt);box.appendChild(row)});
 }
 function openUpg(){FZMODE="up";if(curView!=="forgeView")document.querySelectorAll("nav .tab")[3].click();renderFuse()}
-async function doUpg(it,row){if(busy)return;const lv=it.lv|0,cost=ucost(it.type,lv);if(lv>=3||(S.gems||0)<cost||it.n<1)return;S.gems-=cost;
-  it.n--;if(it.n<=0){const i=S.inv.indexOf(it);if(i>=0)S.inv.splice(i,1);else{const k=S.abl.indexOf(it);if(k>=0)S.abl[k]=null}}
-  const up={type:it.type,n:1,lv:lv+1};if(it.v!=null)up.v=it.v;addInv(up,true);save();
-  const src={type:it.type,n:1,lv:lv};if(it.v!=null)src.v=it.v;await fuseAnim([src,...Array(Math.min(cost,6)).fill({type:"gems",n:1})],up,"UPGRADED");renderFuse();renderAblBar()}
+async function doUpg(it,row){if(busy)return;const t=it.type;S.ulv=S.ulv||{};const lv=S.ulv[t]|0,cost=ucost(t,lv);if(lv>=3||(S.gems||0)<cost)return;S.gems-=cost;
+  S.ulv[t]=lv+1;syncUlv();save();const up={type:t,n:1,lv:lv+1},src={type:t,n:1,lv};if(it.v!=null){up.v=it.v;src.v=it.v}
+  await fuseAnim([src,...Array(Math.min(cost,6)).fill({type:"gems",n:1})],up,"ALL UPGRADED");renderFuse();renderAblBar();updLuck()}
 function closeAbl(e){if(e&&performance.now()-tipClosed<500)return;const sh=$id("abSheet");sh.classList.remove("on");setTimeout(()=>{if(!sh.classList.contains("on"))sh.hidden=true},200)}
 function equipAbl(it){let k=S.abl.findIndex(x=>sameAb(x,it));if(k>=0){S.abl[k].n+=it.n;if(it.v!=null)S.abl[k].v=Math.max(S.abl[k].v||0,it.v);S.inv.splice(S.inv.indexOf(it),1);save();renderAblBar();updLuck();openAbl();SFX.bell([79,83,86],.05);return}
   {const AN=ablN();while(S.abl.length<AN)S.abl.push(null);k=S.abl.findIndex((x,i)=>!x&&i<AN);if(k<0){const o=S.abl[0];S.abl.splice(0,1);S.abl.splice(AN-1,0,null);addInv(o,true);k=AN-1}}
@@ -1927,7 +1929,7 @@ const COLL=[
  {el:"shadow",n:"Voidwalker",ic:"🌑",d:v=>v+"% chance of a ×10 Shadow roll",v:[2,4,7,25]},
  {el:"gold",n:"Midas",ic:"🪙",d:v=>"+"+v+"% chest luck",v:[15,30,60,300]},
  {el:"metal",n:"Clockwork",ic:"⚙️",d:v=>v>=5?"+1 ability slot · Lucky rolls "+v+" sooner":"Lucky rolls "+v+" sooner",v:[1,1,2,5]}];
-const TCOST=100;function isTrans(i){return typeof i==="number"&&!!(S.trans&&S.trans[i])}
+const TCOST=40;function isTrans(i){return typeof i==="number"&&!!(S.trans&&S.trans[i])}
 function transEl(el){if(!S.trans)return false;for(const k in S.trans)if(S.trans[k]&&collEl(+k)===el)return true;return false}
 const collEl=i=>{const e=elemIdx(i);return e==="time"?"metal":e};
 let COLLKEYS=null;function collKeys(){if(!COLLKEYS){COLLKEYS={};for(let i=0;i<N;i++){const e=collEl(i);(COLLKEYS[e]=COLLKEYS[e]||[]).push(i)}}return COLLKEYS}
@@ -2459,15 +2461,15 @@ function elemOf(ref){const t=keyTheme(ref),g=sd(ref)>=16?t.gk:t.k;
   if(g==="gear")return"time";if(g==="gold")return"gold";return"metal"}
 function elemIdx(i){if(!ELEM){ELEM=[];for(let k=0;k<N;k++)ELEM.push(elemOf(k))}return ELEM[i]}
 function keyBuff0(ref,mul){if(ref==null)return null;const F=isFusion(ref),n=num(ref),b=band(n),g=F?0:gradeOf(ref),el=F?elemOf(ref):elemIdx(ref);
-  const s=[1,1.6,2.4,3.4,4.6,6,8,10][Math.min(7,b)]*(isTrans(ref)?11:RMUL[g])*(F?1.5:1)*(mul||1);
-  const type={gem:"rank",fire:"luck",storm:"luck",cosmic:"luck",nature:"aff",water:"aff",frost:"aff",shadow:"mega",time:"lucky",gold:"chest"}[el]||(Math.floor(sd(ref))%2?"luck":"chest");
+  const s=[1,1.6,2.4,3.4,4.6,6,8,10][Math.min(7,b)]*(isTrans(ref)?20:RMUL[g])*(F?1.5:1)*(mul||1);
+  const cm=isTrans(ref)?3:1;const type={gem:"rank",fire:"luck",storm:"luck",cosmic:"luck",nature:"aff",water:"aff",frost:"aff",shadow:"mega",time:"lucky",gold:"chest"}[el]||(Math.floor(sd(ref))%2?"luck":"chest");
   let val,txt;
-  if(type==="luck"){val=Math.min(250,Math.round(2.5*s*(el==="cosmic"?1.3:1)));txt="+"+val+"% Luck"}
-  else if(type==="rank"){val=Math.min(150,Math.round(3*s));txt="+"+val+"% Rank-up"}
-  else if(type==="aff"){val=+Math.min(15,1+.6*s).toFixed(1);txt=val+"× "+ELNAME[el]+" keys"}
-  else if(type==="mega"){val=Math.min(40,Math.max(1,Math.round(.8*s)));txt="+"+val+" Mega luck"}
+  if(type==="luck"){val=Math.min(250*cm,Math.round(2.5*s*(el==="cosmic"?1.3:1)));txt="+"+val+"% Luck"}
+  else if(type==="rank"){val=Math.min(150*cm,Math.round(3*s));txt="+"+val+"% Rank-up"}
+  else if(type==="aff"){val=+Math.min(15*cm,1+.6*s).toFixed(1);txt=val+"× "+ELNAME[el]+" keys"}
+  else if(type==="mega"){val=Math.min(40*cm,Math.max(1,Math.round(.8*s)));txt="+"+val+" Mega luck"}
   else if(type==="lucky"){val=Math.min(5,Math.round(.4+s*.35));txt="Lucky rolls "+val+" sooner"}
-  else{val=Math.min(300,Math.round(8*s));txt="+"+val+"% Chest luck"}
+  else{val=Math.min(300*cm,Math.round(8*s));txt="+"+val+"% Chest luck"}
   return{type,val,el,txt,col:ELCOL[el],rm:RMUL[g],g}}
 const FZM=1.3;
 function keyBuff(ref){const z=isFusion(ref)&&FUSION_BY[ref];if(!z||z.a==null)return keyBuff0(ref);
@@ -2478,7 +2480,7 @@ function buffs(){const B={luck:1,rank:1,aff:{},mega:0,lucky:10,chest:1};
     if(k.type==="luck")B.luck+=k.val/100;else if(k.type==="rank")B.rank+=k.val/100;else if(k.type==="aff")B.aff[k.el]=(B.aff[k.el]||1)*k.val;
     else if(k.type==="mega")B.mega+=k.val;else if(k.type==="lucky")B.lucky-=k.val;else B.chest+=k.val/100})});
   B.luck+=collVal("fire")/100;B.rank+=collVal("gem")/100;B.chest+=collVal("gold")/100;B.mega+=collVal("cosmic");B.lucky-=collVal("metal");
-  B.lucky=Math.max(5,B.lucky);B.rank=Math.min(2.5,B.rank);return B}
+  const nT=Object.keys(S.trans||{}).filter(k=>S.trans[k]).length;B.luck*=1+.25*nT;B.chest*=1+.15*nT;B.lucky=Math.max(5-Math.min(2,nT>>1),B.lucky);B.rank=Math.min(2.5+Math.min(1.5,.25*nT),B.rank);return B}
 function buffSummary(){const B=buffs(),o=[];if(B.luck>1)o.push(["+"+Math.round((B.luck-1)*100)+"% Luck","#ffb84d"]);if(B.rank>1)o.push(["+"+Math.round((B.rank-1)*100)+"% Rank-up",ELCOL.gem]);
   Object.keys(B.aff).forEach(e=>o.push([B.aff[e].toFixed(1)+"× "+ELNAME[e],ELCOL[e]]));if(B.mega)o.push(["Mega ×"+(10+B.mega),ELCOL.shadow]);if(B.lucky<10)o.push(["Lucky every "+B.lucky,ELCOL.time]);if(B.chest>1)o.push(["+"+Math.round((B.chest-1)*100)+"% Chest",ELCOL.gold]);return o}
 
@@ -2564,8 +2566,8 @@ function openSheet(ref){sheetRef=ref;const sh=$id("sheet"),F=isFusion(ref),gi=F?
   if(isEq(ref))mk("UNEQUIP","fbtn alt",()=>{S.equip=S.equip.filter(x=>x!==ref);afterEquip(ref,false)});
   else if((S.equip||[]).length<MAXEQ)mk("EQUIP","fbtn",()=>{S.equip=[...(S.equip||[]),ref];afterEquip(ref,true)});
   else mk("SWAP IN","fbtn",()=>{closeSheet();if(curView!=="colView")document.querySelectorAll("nav .tab")[1].click();setTimeout(()=>enterSwap(ref),260)});
-  if(!F&&gi>=MAXG){if(isTrans(ref)){const t=document.createElement("div");t.className="shnote trans";t.textContent="✦ Transcendent · Collection IV unlocked";bt.appendChild(t)}
-    else{const g=S.gems||0,b=mk("✦ TRANSCEND · 💎"+TCOST,"fbtn trans",()=>doTranscend(ref));if(g<TCOST){b.disabled=true;b.textContent="✦ TRANSCEND · 💎"+g+"/"+TCOST}}}
+  if(!F&&gi>=MAXG){if(isTrans(ref)){const t=document.createElement("div");t.className="shnote trans";t.textContent="✦ Transcendent · buff ×20, 3× limits · +25% luck & +15% chest luck forever";bt.appendChild(t)}
+    else{const tn=document.createElement("div");tn.className="shnote trans";tn.textContent="Transcend: buff ×20 with 3× limits, plus +25% luck and +15% chest luck on every roll forever";bt.appendChild(tn);const g=S.gems||0,b=mk("✦ TRANSCEND · 💎"+TCOST,"fbtn trans",()=>doTranscend(ref));if(g<TCOST){b.disabled=true;b.textContent="✦ TRANSCEND · 💎"+g+"/"+TCOST}}}
   if(!F)mk(S.hat===ref?"HELD ✓":"HOLD","ghost",()=>{hold(S.hat===ref?null:ref);openSheet(ref)});
 
   sh.hidden=false;sh.classList.remove("on");void sh.offsetWidth;sh.classList.add("on");SFX.pop()}
@@ -2748,6 +2750,7 @@ function rollChest(ti,L,B,mul){mul=mul||1;const n=Math.min(5,[1,1,2,2,3,3][ti]*m
     else if(t==="aura")out.push({type:"aura",n:10});
   }
   if(ti>=2&&!out.some(x=>x.type==="key")&&Math.random()<.4)out[0]={type:"key",ref:rollTier(L,B)};
+  out.forEach(x=>{const u=S.ulv&&S.ulv[x.type];if(u&&UPT.includes(x.type))x.lv=Math.max(x.lv|0,u)});
   if(ti>=4&&Math.random()<(ti===5?.08:.03))out.push({type:"asc",n:1});
   if(Math.random()<[.1,.12,.15,.18,.22,.28][ti]*(mul>1?1.8:1))out.push({type:"gems",n:ti===5&&Math.random()<.3?2:1});
   for(let nv=collVal("nature")/100;nv>0;nv-=1)if(Math.random()<nv)out.push(Math.random()<.5?{type:"key",ref:rollTier(L,B)}:{type:"charge",n:1+(ti>>1)});
@@ -3041,7 +3044,7 @@ const fzLeft=r=>(S.counts[r]||0)-1-(fzA===r?1:0)-(fzB===r?1:0);
 function fzPrev(a,b){if(a>b)[a,b]=[b,a];const id="ZP"+a+"_"+b;if(!FUSION_BY[id])FUSION_BY[id]=fzSpec(a,b,id);return id}
 const fzIc=(it,px)=>it.key!=null?iconCanvas(it.key,false,isFusion(it.key)?0:gradeOf(it.key),Math.round(px*2.4)):ablIcon(it,px);
 function renderFuse(){const box=$id("fuseList");if(!box)return;box.innerHTML="";const gn=$id("fzGems");if(gn)gn.textContent="💎 "+(S.gems||0);
-  document.querySelectorAll("#fzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===FZMODE));$id("fzHint").textContent=FZMODE==="up"?"Stronger abilities cost more · one use at a time":"Fuse 2 spare keys into a Fusion Key";
+  document.querySelectorAll("#fzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===FZMODE));$id("fzHint").textContent=FZMODE==="up"?"Upgrades are permanent and boost every copy you own or find":"Fuse 2 spare keys into a Fusion Key";
   if(FZMODE==="up"){renderUpg(box);return}
   if(fzA!=null&&(S.counts[fzA]||0)<2)fzA=null;if(fzB!=null&&(S.counts[fzB]||0)-1-(fzA===fzB?1:0)<1)fzB=null;if(fzA==null&&fzB!=null){fzA=fzB;fzB=null}
   const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -3121,9 +3124,9 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.7.1";
+const VERSION="2.7.3";
 const NOTES=[
- {v:"2.7.1",d:"Oct 8, 2026",i:["New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎100"]},
+ {v:"2.7.3",d:"Oct 8, 2026",i:["Transcending is way stronger: the key's buff is ×20 with 3× higher limits, and every Transcended key gives +25% luck and +15% chest luck forever, equipped or not","Upgrades now level up the whole ability: every copy you own and every one you find in chests","New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎40"]},
  {v:"2.5.7",d:"Oct 7, 2026",i:["Ability upgrades are now much pricier: 💎10, then 20, then 35. All existing upgrades were reset to normal","Fixed chests going blank and the freeze when feeding the Storm (the game uses much less memory now)","Ability upgrades moved into the Fuse tab (Fuse / Upgrade), with the fusion animation","Smoother: less stutter, and the game lowers its effects quality by itself on slower phones","Mega Ticket fuse now costs 💎4","Only spare keys can be fed to the Storm, so you never lose your last copy","Storm, Tempest, Cataclysm and Worldbreaker each get their own roll button colours and outline","Upgraded abilities show stars and a coloured ring, and upgraded Boosted Rolls change colour (blue, purple, red)","30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: spend abilities + a few gems to fuse stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time (💎10, then 20, then 35): Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
  {v:"2.3",d:"Oct 6, 2026",i:["Key Roll got its own site: add it to your home screen, with an intro, cloud saves and save codes","Clash-style chests, gems and Transcending for Collection IV","Rare boosters: Golden Aura, Mega Charge, Godly Charm. All luck stacks","Ascendant Key and Collection IV, with a 3rd ability slot from Clockwork IV","Collection pages, key swapping and tap-twice to equip or unequip","New leaderboard with player profiles, plus a feedback board","Patch notes and automatic updates","Lots of fixes: full-screen layout, lag, chests vanishing, smoother tabs"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
@@ -3211,7 +3214,7 @@ async function boot(){
     const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);if(!d||!u)return;
     const id=await u.id();if(!id)return;db=d;uid=id;
     const cw=await (u.can?u.can("data.write"):null);if(cw===false)canPost=false;}
-    try{const snap=await db.doc(FB?"users/"+uid:"data/users/"+uid+"/keys").get();if(snap.exists){let r=snap.data();if(FB)r=r&&r.s?JSON.parse(r.s):null;r=migrateKeys(r);if(r&&r.counts&&(r.rolls||0)>S.rolls){S=Object.assign(S,JSON.parse(JSON.stringify(r)));["fused","fusedEver","pity","grade","counts"].forEach(k=>{if(!S[k]||typeof S[k]!=="object")S[k]={}});fzClean(S);if(typeof S.hat==="string")S.hat=S.best>=0?S.best:null;updHeader();updLuck();if(!busy){shown=S.hat;setInfo(shown,"",false)}try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}}}catch(e){}
+    try{const snap=await db.doc(FB?"users/"+uid:"data/users/"+uid+"/keys").get();if(snap.exists){let r=snap.data();if(FB)r=r&&r.s?JSON.parse(r.s):null;r=migrateKeys(r);if(r&&r.counts&&(r.rolls||0)>S.rolls){S=Object.assign(S,JSON.parse(JSON.stringify(r)));["fused","fusedEver","pity","grade","counts"].forEach(k=>{if(!S[k]||typeof S[k]!=="object")S[k]={}});fzClean(S);if(typeof S.hat==="string")S.hat=S.best>=0?S.best:null;syncUlv();updHeader();updLuck();if(!busy){shown=S.hat;setInfo(shown,"",false)}try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}}}catch(e){}
     db.collection("board").orderBy("best","desc").limit(50).onSnapshot(s=>{board=s.docs.map(x=>boardFix(Object.assign({id:x.id},x.data())));if(!$id("lbView").hidden)renderLB()},()=>{});try{db.collection("board").orderBy("worth","desc").limit(50).onSnapshot(s=>{boardW=s.docs.map(x=>boardFix(Object.assign({id:x.id},x.data())));if(!$id("lbView").hidden)renderLB()},()=>{})}catch(e){}
     postBoard();setTimeout(checkUpdate,1500);
   }catch(e){}
