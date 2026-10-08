@@ -605,6 +605,22 @@ nav{grid-template-columns:repeat(5,1fr)!important}
 .fztap{position:absolute;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom,0px));text-align:center;font:800 12px var(--body);letter-spacing:.3em;color:rgba(255,255,255,.7);opacity:0;transition:opacity .3s}#fuseFx.tap .fztap{opacity:1;animation:inPulse 1.2s ease-in-out infinite}
 .tab .tl,.tab[aria-selected="true"] .tl{display:none!important}
 .tab svg{width:24px;height:24px}
+
+#roll[data-slv="1"].stormc,#roll[data-slv="1"].storm{--g1:#c48aff;--g2:#7af0ff;--glo:rgba(180,120,255,.6);--glo2:#c48aff}
+#roll[data-slv="2"].stormc,#roll[data-slv="2"].storm{--g1:#ff4a3a;--g2:#ffd54a;--glo:rgba(255,90,60,.6);--glo2:#ff7a4a}
+#roll[data-slv="3"].stormc,#roll[data-slv="3"].storm{--g1:#ff4d6d;--g2:#7ae7ff;--glo:rgba(255,220,120,.6);--glo2:#ffd54a}
+#roll[data-slv="1"].stormc,#roll[data-slv="2"].stormc,#roll[data-slv="3"].stormc{animation:olspin 1.5s linear infinite,olflashV 2.4s linear infinite}
+#roll[data-slv="1"].storm,#roll[data-slv="2"].storm,#roll[data-slv="3"].storm{animation:olspin 1.2s linear infinite,olflashV 2s linear infinite}
+#roll[data-slv="1"].stormc{background:linear-gradient(180deg,#f2e2ff,#c9a6ff 48%,#8a4dff) padding-box,conic-gradient(from var(--ang),#8a4dff,#7af0ff 12%,#fff 16%,#c48aff 22%,#3a1a8a 45%,#fff 50%,#7af0ff 56%,#c48aff 78%,#fff 83%,#8a4dff) border-box;color:#24074a}
+#roll[data-slv="1"].storm{background:linear-gradient(110deg,#1a0838,#6a2ad8 30%,#7af0ff 46%,#6a2ad8 62%,#1a0838) padding-box,conic-gradient(from var(--ang),#8a4dff,#7af0ff 12%,#fff 16%,#c48aff 22%,#3a1a8a 45%,#fff 50%,#7af0ff 56%,#c48aff 78%,#fff 83%,#8a4dff) border-box;color:#f6eaff;text-shadow:0 0 10px #c48aff}
+#roll[data-slv="2"].stormc{background:linear-gradient(180deg,#ffe6b0,#ff9a4a 48%,#d8341a) padding-box,conic-gradient(from var(--ang),#ff3a2a,#ffd54a 12%,#fff 16%,#ff7a4a 22%,#8a0a0a 45%,#fff 50%,#ffd54a 56%,#ff3a2a 78%,#fff 83%,#ff3a2a) border-box;color:#3a0600}
+#roll[data-slv="2"].storm{background:linear-gradient(110deg,#2a0606,#c81a1a 30%,#ffb03a 46%,#c81a1a 62%,#2a0606) padding-box,conic-gradient(from var(--ang),#ff3a2a,#ffd54a 12%,#fff 16%,#ff7a4a 22%,#8a0a0a 45%,#fff 50%,#ffd54a 56%,#ff3a2a 78%,#fff 83%,#ff3a2a) border-box;color:#fff2e0;text-shadow:0 0 10px #ff5a2a}
+#roll[data-slv="3"].stormc{background:linear-gradient(180deg,#fff6d0,#ffd54a 48%,#ff6ad5) padding-box,conic-gradient(from var(--ang),#ff4d6d,#ffd54a 14%,#fff 18%,#4dffa6 30%,#7ae7ff 46%,#fff 50%,#b49aff 62%,#ff6ad5 80%,#fff 86%,#ff4d6d) border-box;color:#3a0626}
+#roll[data-slv="3"].storm{background:linear-gradient(100deg,#ff4d6d,#ffd54a,#4dffa6,#7ae7ff,#b49aff,#ff6ad5,#ff4d6d) padding-box,conic-gradient(from var(--ang),#ff4d6d,#ffd54a 14%,#fff 18%,#4dffa6 30%,#7ae7ff 46%,#fff 50%,#b49aff 62%,#ff6ad5 80%,#fff 86%,#ff4d6d) border-box;background-size:300% 100%,100% 100%;color:#fff;text-shadow:0 0 6px #000,0 0 14px #ff6ad5}
+@keyframes olflashV{0%,40%,46%,70%,74%,100%{box-shadow:0 6px 0 #140c1e,0 0 22px var(--glo)}43%,72%{box-shadow:0 6px 0 #140c1e,0 0 40px #fff,0 0 70px var(--glo2)}}
+.abox .stp{font-size:11px}
+nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(14,11,22,.97)!important}
+#rollLbl.long{font-size:21px;letter-spacing:.12em;padding-left:.12em}
 </style>
 
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -1274,15 +1290,17 @@ const bg=$id("bg"),bc=bg.getContext("2d"),fx=$id("fx"),fc=fx.getContext("2d"),st
 let DPR=1;
 const _spr={};let _sprN=0;function glowSpr(col){let s=_spr[col];if(!s){if(++_sprN>160){for(const k in _spr)delete _spr[k];_sprN=1}s=document.createElement("canvas");s.width=s.height=64;const c=s.getContext("2d"),g=c.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,colA(col,1));g.addColorStop(1,colA(col,0));c.fillStyle=g;c.fillRect(0,0,64,64);_spr[col]=s}return s}
 let _coin=null;function coinSpr(){if(!_coin){_coin=document.createElement("canvas");_coin.width=_coin.height=48;const c=_coin.getContext("2d");c.translate(24,24);const r=21,g=c.createRadialGradient(-r*.35,-r*.4,r*.08,0,0,r);g.addColorStop(0,"#fffbe0");g.addColorStop(.45,"#ffd84a");g.addColorStop(1,"#b0730e");c.fillStyle=g;c.beginPath();c.arc(0,0,r,0,7);c.fill();c.lineWidth=r*.16;c.strokeStyle="#7d4c05";c.stroke();c.beginPath();c.arc(0,0,r*.64,0,7);c.lineWidth=r*.09;c.strokeStyle="rgba(125,76,5,.65)";c.stroke();star(c,0,0,r*.4,5,.45);c.fillStyle="#fff3b0";c.fill()}return _coin}
-function fit(){DPR=Math.min(devicePixelRatio||1,1.5);[[bg,bc],[fx,fc]].forEach(([cv,c])=>{cv.width=innerWidth*DPR;cv.height=H()*DPR;c.setTransform(DPR,0,0,DPR,0,0)});
+function fit(){DPR=Math.min(devicePixelRatio||1,LOWQ?1:1.5);[[bg,bc],[fx,fc]].forEach(([cv,c])=>{cv.width=innerWidth*DPR;cv.height=H()*DPR;c.setTransform(DPR,0,0,DPR,0,0)});
   sizeStage()}
 function sizeStage(){const wrap=$id("stageWrap"),info=document.querySelector(".info");if(!wrap||$id("rollView").hidden)return;
   const avail=wrap.clientHeight-info.offsetHeight-14,size=Math.max(150,Math.min(wrap.clientWidth-8,avail,420));
-  stage.style.width=size+"px";stage.style.height=size+"px";const d=Math.min(devicePixelRatio||1,2.5);stage.width=Math.round(size*d);stage.height=stage.width;placeVeil()}
+  stage.style.width=size+"px";stage.style.height=size+"px";const d=Math.min(devicePixelRatio||1,LOWQ?1.5:2);stage.width=Math.round(size*d);stage.height=stage.width;placeVeil()}
 try{new ResizeObserver(()=>sizeStage()).observe(document.querySelector("main"))}catch(e){}
 addEventListener("resize",fit);
 const W=()=>innerWidth;
-function dialC(){const mn=stage.closest("main");if(!mn||!stage.offsetWidth){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}
+let FRAMEN=0,_dc=null,_dcF=-1,LOWQ=false,FEMA=.016,FCNT=0;
+function dialC(){if(_dcF===FRAMEN&&_dc)return _dc;_dcF=FRAMEN;return _dc=dialC0()}
+function dialC0(){const mn=stage.closest("main");if(!mn||!stage.offsetWidth){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}
   const m=mn.getBoundingClientRect();let x=0,y=0,e=stage;while(e&&e!==mn){x+=e.offsetLeft;y+=e.offsetTop;const p=e.offsetParent;if(p&&p!==mn){x-=p.scrollLeft;y-=p.scrollTop}e=p}
   if(e!==mn){const r=stage.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2}}y-=mn.scrollTop;const w=stage.offsetWidth,hh=stage.offsetHeight;return{x:m.left+x+w/2,y:m.top+y+hh/2,r:w/2}}
 function placeVeil(){const d=dialC(),root=document.documentElement.style;root.setProperty("--bigY",Math.max(46,d.y-d.r-78)+"px");root.setProperty("--bigB",Math.max(0,H()-Math.max(d.y-d.r+4,Math.min(124,H()*.17)+8))+"px");root.setProperty("--dx",d.x+"px");root.setProperty("--dy",d.y+"px");root.setProperty("--dr",Math.max(90,d.r*.95)+"px")}
@@ -1441,18 +1459,18 @@ function shakeApp(c="shake"){const a=$id("app");a.classList.remove(c);void a.off
 function veil(op,full){const v=$id("veil");if(full!==undefined)v.classList.toggle("full",!!full);else if(op===0)v.classList.remove("full");v.style.opacity=op}
 function drawFx(){
   fc.clearRect(0,0,W(),H());if(parts.length>650)parts.splice(0,parts.length-650);if(bolts.length>24)bolts.splice(0,bolts.length-24);if(ringsA.length>30)ringsA.splice(0,ringsA.length-30);
-  for(let k=parts.length-1;k>=0;k--){const p=parts[k];p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;if(!p.trail){p.vx*=p.drag?.975:.985;if(p.drag)p.vy*=.985}p.life-=p.dec;if(p.rot!=null)p.rot+=.12;if(p.life<=0||p.y>H()+30||p.y<-60){parts.splice(k,1);continue}
+  for(let k=parts.length-1;k>=0;k--){const p=parts[k];p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;if(!p.trail){p.vx*=p.drag?.975:.985;if(p.drag)p.vy*=.985}p.life-=p.dec;if(p.rot!=null)p.rot+=.12;if(p.life<=0||p.y>H()+30||p.y<-60){parts[k]=parts[parts.length-1];parts.pop();continue}
     fc.globalAlpha=Math.min(1,p.life*1.6);fc.fillStyle=p.col;
     if(p.sh==="star"){star(fc,p.x,p.y,p.sz*1.5,4,.35);fc.fill()}
     else if(p.sh==="conf"){fc.save();fc.translate(p.x,p.y);fc.rotate(p.rot);fc.scale(1,Math.cos(p.rot*2));fc.fillRect(-p.sz/2,-p.sz/4,p.sz,p.sz/2);fc.restore()}
     else if(p.sh==="coin"){const r=p.sz*1.45,sx=Math.max(.12,Math.abs(Math.cos(p.rot*1.4)));fc.save();fc.translate(p.x,p.y);fc.scale(sx,1);fc.drawImage(coinSpr(),-r*1.14,-r*1.14,r*2.28,r*2.28);fc.restore()}
     else if(p.sh==="clover"){miniClover(fc,p.x,p.y,p.sz,p.rot,1)}
     else if(p.sh==="tri"){fc.save();fc.translate(p.x,p.y);fc.rotate(p.rot);fc.beginPath();fc.moveTo(0,-p.sz);fc.lineTo(p.sz*.6,p.sz*.7);fc.lineTo(-p.sz*.5,p.sz*.5);fc.closePath();fc.fill();fc.strokeStyle="rgba(255,255,255,.7)";fc.lineWidth=.8;fc.stroke();fc.restore()}
-    else if(p.sh==="flake"){fc.save();fc.translate(p.x,p.y);fc.rotate(p.rot*.3);fc.strokeStyle="#fff";fc.lineWidth=1.3;fc.shadowColor="#bff4ff";fc.shadowBlur=6;fc.beginPath();for(let q=0;q<3;q++){fc.rotate(Math.PI/3);fc.moveTo(-p.sz,0);fc.lineTo(p.sz,0)}fc.stroke();fc.restore()}
+    else if(p.sh==="flake"){fc.save();fc.translate(p.x,p.y);fc.rotate(p.rot*.3);fc.strokeStyle="#fff";fc.lineWidth=1.3;fc.beginPath();for(let q=0;q<3;q++){fc.rotate(Math.PI/3);fc.moveTo(-p.sz,0);fc.lineTo(p.sz,0)}fc.stroke();fc.restore()}
     else if(p.sh==="bubble"){const bx=p.x+Math.sin(T*3+p.p)*4;fc.strokeStyle=p.col;fc.lineWidth=1.4;fc.beginPath();fc.arc(bx,p.y,p.sz,0,7);fc.stroke();fc.fillStyle=colA(p.col,.12);fc.fill();fc.fillStyle="rgba(255,255,255,.8)";fc.beginPath();fc.arc(bx-p.sz*.35,p.y-p.sz*.35,p.sz*.2,0,7);fc.fill()}
     else if(p.sh==="leaf"){fc.save();fc.translate(p.x+Math.sin(T*2+p.p)*14,p.y);fc.rotate(p.rot);fc.scale(1,Math.cos(p.rot*1.3)*.6+.4);fc.beginPath();fc.ellipse(0,0,p.sz,p.sz*.5,0,0,7);fc.fill();fc.restore()}
     else if(p.sh==="smoke"){fc.globalAlpha=Math.min(.35,p.life*.4)*.8;p.sz*=1.01;fc.drawImage(glowSpr(p.col),p.x-p.sz,p.y-p.sz,p.sz*2,p.sz*2)}
-    else if(p.sh==="glyph"){fc.font=p.sz+"px serif";fc.textAlign="center";fc.shadowColor=p.col;fc.shadowBlur=10;fc.fillText(p.ch,p.x,p.y);fc.shadowBlur=0}
+    else if(p.sh==="glyph"){fc.font=p.sz+"px serif";fc.textAlign="center";fc.fillText(p.ch,p.x,p.y);fc.shadowBlur=0}
     else if(p.sh==="streak"){fc.strokeStyle=p.col;fc.lineWidth=p.sz;fc.lineCap="round";fc.beginPath();fc.moveTo(p.x,p.y);fc.lineTo(p.x-p.vx*6,p.y-p.vy*6);fc.stroke();fc.beginPath();fc.arc(p.x,p.y,p.sz*1.2,0,7);fc.fill()}
     else{fc.beginPath();fc.arc(p.x,p.y,p.sz,0,7);fc.fill();if(p.trail){fc.strokeStyle=p.col;fc.lineWidth=p.sz*.6;fc.beginPath();fc.moveTo(p.x,p.y);fc.lineTo(p.x-p.vx*3,p.y-p.vy*3);fc.stroke()}}}
   fc.globalAlpha=1;
@@ -1478,7 +1496,8 @@ function ribbon(c1,c2,rb){const r=$id("ribbon");r.style.setProperty("--r1",c1);r
 function toast(msg){const t=$id("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),1700)}
 
 /* ================= MAIN LOOP ================= */
-function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;T+=dt;
+function goLowQ(){if(LOWQ)return;LOWQ=true;try{[fc,bc].forEach(c=>Object.defineProperty(c,"shadowBlur",{set(){},get(){return 0},configurable:true}))}catch(e){}fit()}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;T+=dt;FRAMEN++;if(!document.hidden&&dt>0){FEMA=FEMA*.96+dt*.04;FCNT++;if(!LOWQ&&FCNT>150&&FEMA>.021)goLowQ()}
   const amp=Math.max(shakeHold,shakeAmt);shakeAmt*=.86;const app=document.body;if(amp>.3){app.style.transform=`translate3d(${(Math.random()-.5)*amp*2.6}px,${(Math.random()-.5)*amp*2.6}px,0) rotate(${(Math.random()-.5)*amp*.15}deg)`;app._sh=1}else if(app._sh){app.style.transform="";app._sh=0}
   drawBg(T);if(!$id("rollView").hidden)drawStage(T,dt);drawFx();if(SIDE&&!$id("rollView").hidden)drawSide();if(!$id("fuseView").hidden)drawChestPreview();if(sheetRef!=null)drawSheet();if(!$id("rank").hidden)drawRank(T);
   requestAnimationFrame(loop)}
@@ -1503,9 +1522,9 @@ function hold(ref){S.hat=ref;save();postBoard();setInfo(shown,"",false);toast(re
 function updHeader(){$id("rollsN").textContent=S.rolls.toLocaleString();const b=$id("bestN");if(S.best>=0){b.textContent="1 in "+fmtOdds(ODDS[S.best]);b.style.color=tierCSS(S.best)}else{b.textContent="—";b.style.color=""}}
 function updLuck(){const B=buffs(),ev=B.lucky,n=S.rolls%ev,mega=50-(S.rolls%50),L=nextLuck(),btn=$id("roll"),ch="";
   const SR=stormReady(),ST=L===10&&SR;btn.classList.toggle("lucky",L===3);btn.classList.toggle("mega",L===10&&!ST);btn.classList.toggle("storm",ST);
-  $id("rollLbl").textContent=ST?stormLv().n.toUpperCase()+" ROLL":L===10?"MEGA ROLL":L===3?"LUCKY ROLL":"ROLL";
+  $id("rollLbl").textContent=ST?stormLv().n.toUpperCase()+" ROLL":L===10?"MEGA ROLL":L===3?"LUCKY ROLL":"ROLL";$id("rollLbl").classList.toggle("long",$id("rollLbl").textContent.length>13);
   const SL=SR?stormLv():null;$id("rollSub").textContent=(ST?"Luck ×"+(SL.luck+B.mega):L===10?"Luck ×"+(10+B.mega):L===3?"Luck ×3":(mega<=ev-n?(SR?"⚡ "+SL.n+" in ":"Mega in ")+mega:"Lucky in "+(ev-n)))+ch;
-  btn.classList.toggle("stormc",SR&&!ST);
+  btn.classList.toggle("stormc",SR&&!ST);btn.dataset.slv=SR?String(STORM_LV.indexOf(SL)):"";
   $id("rollProg").style.width=(L>1?100:n/ev*100)+"%"}
 
 /* ================= KEY THEMES (reveal effects matched to the key) ================= */
@@ -1752,7 +1771,7 @@ function ablInfo(it){const n=it.n;switch(it.type){
   case"x5":return{col:"#c48aff",t:"Mega Charge"+lvTag(it),d:"×"+multOf("x5",it.lv)+" luck · "+n+" roll"+(n>1?"s":"")};
   case"aura":return{col:"#ffcf5a",t:"Golden Aura"+lvTag(it),d:"×"+multOf("aura",it.lv)+" luck · "+n+" rolls"};
   case"gems":return{col:"#7af0ff",t:"Gems",d:"+"+n};
-  case"charge":return{col:"#ffd54a",t:"Boosted Rolls"+lvTag(it),d:"×"+multOf("charge",it.lv)+" luck · "+n+" roll"+(n>1?"s":"")};
+  case"charge":return{col:["#ffd54a","#5ae0ff","#c48aff","#ff4d6d"][it.lv|0],t:"Boosted Rolls"+lvTag(it),d:"×"+multOf("charge",it.lv)+" luck · "+n+" roll"+(n>1?"s":"")};
   case"clover":return{col:"#5fe07a",t:"Lucky Clover"+lvTag(it),d:"+"+cloverV(it.v||15,it.lv)+"% luck · "+n+" rolls"};
   case"dice":return{col:"#7ae7ff",t:"Lucky Dice"+lvTag(it),d:"roll "+diceN(it.lv)+" times, keep the best key · "+n+" roll"+(n>1?"s":"")};
   case"ltix":return{col:"#7dffa8",t:"Lucky Ticket",d:"next roll becomes Lucky · ×"+n};
@@ -1766,7 +1785,11 @@ function ablInfo(it){const n=it.n;switch(it.type){
   case"siphon":return{col:"#8ad8ff",t:"Storm Siphon"+lvTag(it),d:"+"+siphV(it.v,it.lv)+" storm charge per roll · "+n+" rolls"};
   case"star":return{col:"#fff27a",t:"Rank Star",d:"+1 rank to a key · ×"+n};
   case"copier":return{col:"#9ef0ff",t:"Key Copy",d:"+1 copy of a key · ×"+n}}}
-function ablIcon(it,px){const cv=document.createElement("canvas");cv.width=cv.height=px*2;const c=cv.getContext("2d");c.translate(px,px*1.06);lootIcon(c,it,px*2*1.3,ablInfo(it).col);return cv}
+function ablIcon(it,px){const cv=document.createElement("canvas");cv.width=cv.height=px*2;const c=cv.getContext("2d");
+  if(it&&it.lv){const col=["","#5ae0ff","#c48aff","#ff4d6d"][it.lv];c.save();c.translate(px,px);c.strokeStyle=col;c.lineWidth=px*.09;c.shadowColor=col;c.shadowBlur=px*.3;c.beginPath();c.arc(0,0,px*.9,0,7);c.stroke();c.restore()}
+  c.save();c.translate(px,px*1.06);lootIcon(c,it,px*2*1.3,ablInfo(it).col);c.restore();
+  if(it&&it.lv){const n=it.lv;for(let q=0;q<n;q++){const x=px+(q-(n-1)/2)*px*.36,y=px*.2;c.fillStyle="#ffe27a";c.strokeStyle="#3a2200";c.lineWidth=px*.04;star(c,x,y,px*.16,5,.45);c.fill();c.stroke()}}
+  return cv}
 function renderAblBar(){const bar=$id("ablBar");if(!bar)return;bar.innerHTML="";const AN=ablN();while(S.abl.length<AN)S.abl.push(null);bar.style.gridTemplateColumns="repeat("+AN+",minmax(0,1fr))";bar.classList.toggle("three",AN>2);
   for(let k=0;k<AN;k++){const it=S.abl[k],b=document.createElement("button");b.className="ablslot"+(it?"":" empty");
     if(it){const inf=ablInfo(it);b.style.setProperty("--ac",inf.col);b.appendChild(ablIcon(it,15));const s=document.createElement("span");s.textContent=inf.t;const n=document.createElement("b");n.textContent="×"+it.n;b.append(s,n)}
@@ -1955,17 +1978,16 @@ function renderCombo(){const box=$id("comboBox");if(!box)return;box.innerHTML=""
   const d=document.createElement("div");d.className="cdesc";d.textContent=g.next?"Next: "+g.next.n+" ×"+g.next.luck+" · "+Math.floor(g.p*100)+"%":"Maxed";box.appendChild(d);
   const b=document.createElement("button");b.className="fbtn sm stfeed";b.textContent=g.next?"FEED KEYS":"FULLY CHARGED";b.disabled=!g.next;b.onclick=openStorm;box.appendChild(b)}
 function openStorm(){if(busy)return;const sh=$id("stSheet"),G=$id("stGrid");G.innerHTML="";updStormBar();
-  const L=[];for(let i=0;i<N;i++)if((S.counts[i]||0)>0)L.push(i);L.sort((a,b)=>b-a);
-  if(!L.length)G.innerHTML='<div class="abempty">No keys to feed.</div>';
+  const L=[];for(let i=0;i<N;i++)if((S.counts[i]||0)>1)L.push(i);L.sort((a,b)=>b-a);
+  if(!L.length)G.innerHTML='<div class="abempty">No spare keys to feed. Roll duplicates to get spares.</div>';
   L.forEach(r=>{const b=document.createElement("div");b.className="abox stk";b.setAttribute("role","button");b.tabIndex=0;b.style.setProperty("--ac",tierCSS(r));b.appendChild(iconCanvas(r,false,gradeOf(r),30));
-    const n=document.createElement("b");n.className="abn";n.textContent="×"+S.counts[r];b.appendChild(n);const p=document.createElement("span");p.className="stp";p.textContent="+"+stormPts(r);b.appendChild(p);
-    if(S.counts[r]===1){const w=document.createElement("span");w.className="stlast";w.textContent="LAST";b.appendChild(w)}
+    const n=document.createElement("b");n.className="abn";n.textContent=(S.counts[r]-1)+" spare";b.appendChild(n);const p=document.createElement("span");p.className="stp";p.textContent="+"+stormPts(r);b.appendChild(p);
     b.onclick=()=>feedKey(r,b);G.appendChild(b)});
   if(!sh.classList.contains("on")){sh.hidden=false;sh.classList.remove("on");void sh.offsetWidth;sh.classList.add("on");SFX.pop()}}
 function closeStorm(){const sh=$id("stSheet");sh.classList.remove("on");setTimeout(()=>{if(!sh.classList.contains("on"))sh.hidden=true},200);renderCol(true);updLuck()}
 function updStormBar(){const g=stormSeg(),cur=g.l?STORM_LV[g.l-1]:null,tgt=g.next||cur;$id("stFill").style.width=(g.p*100)+"%";$id("stFill").style.setProperty("--bc",tgt.c[0]);
   $id("stPct").textContent=g.next?(cur?cur.n+" ✓ · ":"")+g.next.n+" "+Math.floor(g.p*100)+"%":"WORLDBREAKER MAXED";$id("stLv").innerHTML=pipsHTML(g.l);$id("stSheet").classList.toggle("full",!g.next)}
-function feedKey(r,el){if(stormLevel()>=STORM_LV.length||!(S.counts[r]>0))return;const before=stormLevel(),pts=stormPts(r),br=el.getBoundingClientRect(),bar=$id("stFill").parentElement.getBoundingClientRect();
+function feedKey(r,el){if(stormLevel()>=STORM_LV.length||!(S.counts[r]>1))return;const before=stormLevel(),pts=stormPts(r),br=el.getBoundingClientRect(),bar=$id("stFill").parentElement.getBoundingClientRect();
   S.counts[r]--;if(!S.counts[r]){S.seen=S.seen||{};S.seen[r]=1;S.equip=(S.equip||[]).filter(x=>x!==r)}S.stormBar=Math.min(STORM_MAX,(S.stormBar||0)+pts);save();
   const g=stormSeg(),tx=bar.left+bar.width*(g.l>before?1:g.p),ty=bar.top+bar.height/2;stFeed.push({r,sx:br.left+br.width/2,sy:br.top+br.height/2,tx,ty,t0:T});
   osc(300+Math.min(pts,400),.18,"sawtooth",.05,0,1600);noise(.1,.1,6000,2000,0,"highpass");vib(15);
@@ -2684,7 +2706,7 @@ function lootIcon(c,it,w,col){const OL="#170b04",lw=w*.035;c.save();c.lineJoin="
   glow(w*.42,.45);
   switch(it.type){
   case"charge":{const P=[[.08,-.36],[-.2,.04],[-.02,.04],[-.1,.36],[.22,-.06],[.03,-.06]];c.beginPath();P.forEach(([x,y],i)=>i?c.lineTo(x*w,y*w):c.moveTo(x*w,y*w));c.closePath();
-    const g=c.createLinearGradient(0,-w*.36,0,w*.36);g.addColorStop(0,"#fffbd0");g.addColorStop(.45,"#ffd54a");g.addColorStop(1,"#ff8a1a");c.fillStyle=g;c.fill();out();
+    const BC=[["#fffbd0","#ffd54a","#ff8a1a"],["#e6fdff","#5ae0ff","#1a6ad8"],["#f6e8ff","#c48aff","#6a1ad8"],["#ffe0ea","#ff4d6d","#a8001e"]][it.lv|0],g=c.createLinearGradient(0,-w*.36,0,w*.36);g.addColorStop(0,BC[0]);g.addColorStop(.45,BC[1]);g.addColorStop(1,BC[2]);c.fillStyle=g;c.fill();out();
     c.beginPath();c.moveTo(.05*w,-.28*w);c.lineTo(-.12*w,.02*w);c.strokeStyle="rgba(255,255,255,.8)";c.lineWidth=lw*.8;c.stroke();
     c.fillStyle="#fff";for(const [x,y] of [[-.28,-.2],[.3,.18],[.26,-.3]]){star(c,x*w,y*w,w*.05,4,.3);c.fill()}
     {const L="×"+multOf("charge",it.lv);c.font=`400 ${w*.17}px 'Luckiest Guy',Impact,sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineWidth=lw*1.6;c.strokeStyle=OL;c.strokeText(L,w*.2,w*.3);c.fillStyle="#fff6c0";c.fillText(L,w*.2,w*.3)}break}
@@ -2941,7 +2963,7 @@ const FUSES=[
  {in:[["x5",3]],out:{type:"godly",n:1},g:8},
  {in:[["twin",3]],out:{type:"tri",n:1},g:4},
  {in:[["floor",3]],out:{type:"floor2",n:1},g:5},
- {in:[["ltix",3]],out:{type:"mtix",n:1},g:2},
+ {in:[["ltix",3]],out:{type:"mtix",n:1},g:4},
  {in:[["clover",6],["dice",2]],out:{type:"dice",n:2,lv:2},g:3}];
 const haveAb=t=>S.inv.filter(x=>x.type===t).reduce((a,x)=>a+x.n,0)+(S.abl||[]).filter(x=>x&&x.type===t).reduce((a,x)=>a+x.n,0);
 function takeAb(t,n){const L=[...S.inv.filter(x=>x.type===t),...(S.abl||[]).filter(x=>x&&x.type===t)].sort((a,b)=>(a.lv|0)-(b.lv|0));for(const it of L){if(n<=0)break;const k=Math.min(n,it.n);it.n-=k;n-=k;if(it.n<=0){const i=S.inv.indexOf(it);if(i>=0)S.inv.splice(i,1);else{const j=S.abl.indexOf(it);if(j>=0)S.abl[j]=null}}}}
@@ -3005,9 +3027,9 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.5.2";
+const VERSION="2.5.4";
 const NOTES=[
- {v:"2.5.2",d:"Oct 7, 2026",i:["30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: spend abilities + a few gems to fuse stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time for 💎3, then 5, then 7: Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
+ {v:"2.5.4",d:"Oct 7, 2026",i:["Smoother: less stutter, and the game lowers its effects quality by itself on slower phones","Mega Ticket fuse now costs 💎4","Only spare keys can be fed to the Storm, so you never lose your last copy","Storm, Tempest, Cataclysm and Worldbreaker each get their own roll button colours and outline","Upgraded abilities show stars and a coloured ring, and upgraded Boosted Rolls change colour (blue, purple, red)","30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: spend abilities + a few gems to fuse stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time for 💎3, then 5, then 7: Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
  {v:"2.3",d:"Oct 6, 2026",i:["Key Roll got its own site: add it to your home screen, with an intro, cloud saves and save codes","Clash-style chests, gems and Transcending for Collection IV","Rare boosters: Golden Aura, Mega Charge, Godly Charm. All luck stacks","Ascendant Key and Collection IV, with a 3rd ability slot from Clockwork IV","Collection pages, key swapping and tap-twice to equip or unequip","New leaderboard with player profiles, plus a feedback board","Patch notes and automatic updates","Lots of fixes: full-screen layout, lag, chests vanishing, smoother tabs"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
  {v:"1.6",d:"Oct 4, 2026",i:["Chests and abilities","Equip keys for buffs"]}];
