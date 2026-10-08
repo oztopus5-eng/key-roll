@@ -622,6 +622,11 @@ nav{grid-template-columns:repeat(5,1fr)!important}
 .fzgo{min-width:170px}.fzbox.ok .fzgo:not(:disabled){animation:btnBob 1.6s ease-in-out infinite}
 .fzgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .fzout b{white-space:normal!important;max-width:90vw;text-align:center}
+#stormBtn{flex:none;margin-top:10px;padding:7px 18px;border-radius:999px;border:1.5px solid var(--sc);background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 30%,#0b0a1e),#0b0a1e);color:#fff;display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 0 16px color-mix(in srgb,var(--sc) 45%,transparent);animation:btnBob 1.6s ease-in-out infinite}
+#stormBtn b{font:800 14px var(--display);letter-spacing:.08em;color:var(--sc)}#stormBtn span{font:700 10.5px var(--body);opacity:.75}
+#stormBtn.on{animation:stArm .9s ease-in-out infinite;background:linear-gradient(135deg,var(--sc),var(--sc2));border-color:#fff}#stormBtn.on b,#stormBtn.on span{color:#0b0a1e}
+@keyframes stArm{50%{box-shadow:0 0 30px var(--sc),0 0 60px color-mix(in srgb,var(--sc) 40%,transparent);transform:scale(1.04)}}
+.stuse{margin-top:6px;width:100%;background:linear-gradient(180deg,color-mix(in srgb,var(--sc) 70%,#fff),var(--sc))!important;color:#0b0a1e!important}.stuse.on{opacity:.8}
 .fzchip.got{border-color:rgba(125,255,168,.45)}.fzchip.got b{color:#7dffa8}
 .fzb{padding:9px 14px;font-size:12.5px;white-space:nowrap}.fzb i{font-style:normal;margin-left:4px;opacity:.85}
 #fuseFx{position:fixed;inset:0;z-index:4;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--ac) 22%,#140a2a),#030208 70%);opacity:0;transition:opacity .25s;overflow:hidden;--core:.2}
@@ -690,7 +695,7 @@ img.icv{image-rendering:auto;display:block;height:auto}
         <button class="ghost" id="holdBtn" hidden>Hold this key</button>
       </div></div>
       <div class="ablbar" id="ablBar"></div>
-      <button id="roll"><span id="rollLbl">ROLL</span><span id="rollSub"></span><i id="rollTrack"></i><i id="rollProg"></i></button>
+      <button id="stormBtn" hidden></button><button id="roll"><span id="rollLbl">ROLL</span><span id="rollSub"></span><i id="rollTrack"></i><i id="rollProg"></i></button>
     </section>
     <section class="view" id="colView" hidden>
       <h2>Keys</h2>
@@ -1570,9 +1575,9 @@ $id("holdBtn").onclick=()=>{if(shown!=null)hold(shown)};
 function hold(ref){S.hat=ref;save();postBoard();setInfo(shown,"",false);toast(ref==null?"Key put away":"Holding "+keyName(ref));if(!$id("colView").hidden)renderCol()}
 function updHeader(){$id("rollsN").textContent=S.rolls.toLocaleString();const b=$id("bestN");if(S.best>=0){b.textContent="1 in "+fmtOdds(ODDS[S.best]);b.style.color=tierCSS(S.best)}else{b.textContent="—";b.style.color=""}}
 function updLuck(){const B=buffs(),ev=B.lucky,n=S.rolls%ev,mega=50-(S.rolls%50),L=nextLuck(),btn=$id("roll"),ch="";
-  const SR=stormReady(),ST=L===10&&SR;btn.classList.toggle("lucky",L===3);btn.classList.toggle("mega",L===10&&!ST);btn.classList.toggle("storm",ST);
-  $id("rollLbl").textContent=ST?stormLv().n.toUpperCase()+" ROLL":L===10?"MEGA ROLL":L===3?"LUCKY ROLL":"ROLL";$id("rollLbl").classList.toggle("long",$id("rollLbl").textContent.length>13);
-  const SL=SR?stormLv():null;$id("rollSub").textContent=(ST?"Luck ×"+(SL.luck+B.mega):L===10?"Luck ×"+(10+B.mega):L===3?"Luck ×3":(mega<=ev-n?(SR?"⚡ "+SL.n+" in ":"Mega in ")+mega:"Lucky in "+(ev-n)))+ch;
+  const SR=stormReady(),ST=SR&&!!S.stormArm;btn.classList.toggle("lucky",L===3);btn.classList.toggle("mega",L===10&&!ST);if(ST)btn.classList.remove("lucky");btn.classList.toggle("storm",ST);
+  $id("rollLbl").textContent=ST?stormLv().n.toUpperCase()+" ROLL":L===10?"MEGA ROLL":L===3?"LUCKY ROLL":"ROLL";updStormBtn();$id("rollLbl").classList.toggle("long",$id("rollLbl").textContent.length>13);
+  const SL=SR?stormLv():null;$id("rollSub").textContent=(ST?"Luck ×"+(SL.luck+B.mega):L===10?"Luck ×"+(10+B.mega):L===3?"Luck ×3":(mega<=ev-n?"Mega in "+mega:"Lucky in "+(ev-n)))+ch;
   btn.classList.toggle("stormc",SR&&!ST);btn.dataset.slv=SR?String(STORM_LV.indexOf(SL)):"";
   $id("rollProg").style.setProperty("--p",(L>1?1:n/ev).toFixed(3))}
 
@@ -2025,7 +2030,13 @@ function renderCombo(){const box=$id("comboBox");if(!box)return;box.innerHTML=""
   const hd=document.createElement("div");hd.className="chead";hd.innerHTML='<span class="ctitle">⚡ '+(cur?cur.n.toUpperCase()+" ×"+cur.luck:"STORM")+'</span>'+pipsHTML(g.l);box.appendChild(hd);
   const bar=document.createElement("div");bar.className="sbar";bar.innerHTML='<i style="width:'+(g.p*100)+'%;--bc:'+(g.next||cur).c[0]+'"></i>';box.appendChild(bar);
   const d=document.createElement("div");d.className="cdesc";d.textContent=g.next?"Next: "+g.next.n+" ×"+g.next.luck+" · "+Math.floor(g.p*100)+"%":"Maxed";box.appendChild(d);
-  const b=document.createElement("button");b.className="fbtn sm stfeed";b.textContent=g.next?"FEED KEYS":"FULLY CHARGED";b.disabled=!g.next;b.onclick=openStorm;box.appendChild(b)}
+  const b=document.createElement("button");b.className="fbtn sm stfeed";b.textContent=g.next?"FEED KEYS":"FULLY CHARGED";b.disabled=!g.next;b.onclick=openStorm;box.appendChild(b);if(g.l){const u=document.createElement("button");u.className="fbtn sm stuse"+(S.stormArm?" on":"");u.textContent=S.stormArm?"ARMED ✓":"⚡ UNLEASH";u.onclick=toggleStorm;box.appendChild(u)}}
+function toggleStorm(){if(busy||!stormReady())return;S.stormArm=!S.stormArm;save();const L=stormLv();
+  if(S.stormArm){thunder(.4);flash(.35,260,L.c[0]);shakeAmt=8;vib([40,30,80]);const b=$id("stormBtn").getBoundingClientRect();boom(40,[L.c[0],"#fff"],6,b.left+b.width/2,b.top+b.height/2);toast("⚡ "+L.n+" armed: your next roll is ×"+L.luck)}else{osc(400,.1,"triangle",.04,0,250)}
+  updLuck();renderCombo()}
+function updStormBtn(){const b=$id("stormBtn");if(!b)return;const R=stormReady();b.hidden=!R;if(!R){S.stormArm=false;return}const L=stormLv();b.style.setProperty("--sc",L.c[0]);b.style.setProperty("--sc2",L.c[3]||L.c[0]);b.classList.toggle("on",!!S.stormArm);
+  b.innerHTML=S.stormArm?"<b>⚡ "+L.n.toUpperCase()+" ARMED</b><span>tap to cancel</span>":"<b>⚡ UNLEASH "+L.n.toUpperCase()+"</b><span>×"+L.luck+" luck</span>"}
+$id("stormBtn").onclick=toggleStorm;
 function openStorm(){if(busy)return;const sh=$id("stSheet"),G=$id("stGrid");G.innerHTML="";updStormBar();
   const L=[];for(let i=0;i<N;i++)if((S.counts[i]||0)>1)L.push(i);L.sort((a,b)=>b-a);
   if(!L.length)G.innerHTML='<div class="abempty">No spare keys to feed. Roll duplicates to get spares.</div>';
@@ -2177,9 +2188,9 @@ async function doRoll(){
   {const k=useAblSlot("clover");if(k>=0){const v=cloverV(S.abl[k].v,S.abl[k].lv);boost*=1+v/100;fired.push([k,S.abl[k],"🍀 +"+v+"% LUCK"])}}
   let totemEl=null;
   const firedCopy=fired.map(([k,it,l])=>[k,{...it},l]);fired.forEach(([k])=>spendAbl(k));
-  stormMode=luck===10&&stormReady()?stormLv():false;if(stormMode){S.stormBar=0;S.storms=(S.storms||0)+1;save()}
+  stormMode=S.stormArm&&stormReady()?stormLv():false;S.stormArm=false;if(stormMode){S.stormBar=0;S.storms=(S.storms||0)+1;save()}
   const shadowR=!stormMode&&Math.random()<collVal("shadow")/100;
-  const rollL=(luck===10?(stormMode?stormMode.luck:10)+RBf.mega:luck)*RBf.luck*boost*(shadowR?10:1);let tier=rollTier(rollL,RBf);ROLLT=rollL;
+  const rollL=(stormMode?stormMode.luck+RBf.mega:luck===10?10+RBf.mega:luck)*RBf.luck*boost*(shadowR?10:1);let tier=rollTier(rollL,RBf);ROLLT=rollL;
   const fk=t=>{const k=useAblSlot(t);if(k<0)return null;const it={...S.abl[k]};spendAbl(k);return[k,it]};
   const fDice=fk("dice");if(fDice){const dn=diceN(fDice[1].lv);firedCopy.push([fDice[0],fDice[1],"🎲 BEST OF "+dn]);for(let q=1;q<dn;q++){const t2=rollTier(rollL,RBf);if(t2>tier)tier=t2}}
   const fFloor2=fk("floor2"),fFloor=fFloor2?null:fk("floor"),fTri=fk("tri"),fTwin=fTri?null:fk("twin"),fEcho=fk("echo"),fSiph=fk("siphon");
@@ -3124,9 +3135,9 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.7.3";
+const VERSION="2.7.4";
 const NOTES=[
- {v:"2.7.3",d:"Oct 8, 2026",i:["Transcending is way stronger: the key's buff is ×20 with 3× higher limits, and every Transcended key gives +25% luck and +15% chest luck forever, equipped or not","Upgrades now level up the whole ability: every copy you own and every one you find in chests","New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎40"]},
+ {v:"2.7.4",d:"Oct 8, 2026",i:["The Storm no longer fires on its own: tap UNLEASH when you want it, and your next roll becomes a Storm roll","Transcending is way stronger: the key's buff is ×20 with 3× higher limits, and every Transcended key gives +25% luck and +15% chest luck forever, equipped or not","Upgrades now level up the whole ability: every copy you own and every one you find in chests","New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎40"]},
  {v:"2.5.7",d:"Oct 7, 2026",i:["Ability upgrades are now much pricier: 💎10, then 20, then 35. All existing upgrades were reset to normal","Fixed chests going blank and the freeze when feeding the Storm (the game uses much less memory now)","Ability upgrades moved into the Fuse tab (Fuse / Upgrade), with the fusion animation","Smoother: less stutter, and the game lowers its effects quality by itself on slower phones","Mega Ticket fuse now costs 💎4","Only spare keys can be fed to the Storm, so you never lose your last copy","Storm, Tempest, Cataclysm and Worldbreaker each get their own roll button colours and outline","Upgraded abilities show stars and a coloured ring, and upgraded Boosted Rolls change colour (blue, purple, red)","30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: spend abilities + a few gems to fuse stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time (💎10, then 20, then 35): Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
  {v:"2.3",d:"Oct 6, 2026",i:["Key Roll got its own site: add it to your home screen, with an intro, cloud saves and save codes","Clash-style chests, gems and Transcending for Collection IV","Rare boosters: Golden Aura, Mega Charge, Godly Charm. All luck stacks","Ascendant Key and Collection IV, with a 3rd ability slot from Clockwork IV","Collection pages, key swapping and tap-twice to equip or unequip","New leaderboard with player profiles, plus a feedback board","Patch notes and automatic updates","Lots of fixes: full-screen layout, lag, chests vanishing, smoother tabs"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
