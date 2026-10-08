@@ -575,6 +575,30 @@ main{overflow:hidden}
 .uppips{display:flex;gap:4px}.uppips u{width:22px;height:5px;border-radius:3px;background:#2a2440}.uppips u.on{background:var(--ac);box-shadow:0 0 6px var(--ac)}
 .upb{padding:9px 12px;font-size:13px;white-space:nowrap}
 .uprow.pop{animation:tabPop .5s cubic-bezier(.2,1.8,.4,1)}
+nav{grid-template-columns:repeat(5,1fr)!important}
+.abox .abnm{position:absolute;left:4px;right:4px;top:3px;font:800 8.5px var(--body);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000;padding-right:16px}
+.abgrid.eqg .abox .abnm{font-size:10px}
+.abslots{font-size:11px;color:var(--mute);margin:-2px 0 8px;line-height:1.35}
+.fzhint{font-size:12px;color:var(--mute);margin:-4px 0 10px}
+.fzrow{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:8px;margin-bottom:8px;padding:10px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel))}
+.fzrow.ok{border-color:color-mix(in srgb,var(--ac) 55%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--ac) 18%,transparent)}
+.fzin{display:flex;gap:4px}.fzi{display:flex;flex-direction:column;align-items:center;gap:1px}.fzi canvas{width:32px;height:32px}.fzi b{font:800 10px var(--body);color:#dff}.fzi.lack b{color:#ff8a9a}.fzi.lack canvas{opacity:.55}
+.fzar{color:var(--mute);font-size:16px}
+.fzo{display:flex;align-items:center;gap:6px;min-width:0}.fzo canvas{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 8px var(--ac))}.fzo span{font:700 12px var(--display);line-height:1.15}
+.fzb{padding:9px 12px;font-size:12px}
+#fuseFx{position:fixed;inset:0;z-index:6;background:radial-gradient(circle at 50% 42%,rgba(40,20,80,.85),rgba(3,2,8,.95));display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
+#fuseFx.go{opacity:1}
+#fzRing{position:absolute;left:50%;top:42%;width:70vmin;height:70vmin;margin:-35vmin 0 0 -35vmin;border-radius:50%;background:conic-gradient(from 0deg,#ff6ad5,#ffd54a,#7ae7ff,#b49aff,#ff6ad5);-webkit-mask:radial-gradient(circle,transparent 58%,#000 60%,#000 63%,transparent 65%);mask:radial-gradient(circle,transparent 58%,#000 60%,#000 63%,transparent 65%);animation:fzSpin 1.2s linear infinite;opacity:.8}
+#fuseFx.done #fzRing{animation:fzBurst .6s ease-out forwards}
+@keyframes fzSpin{to{transform:rotate(360deg)}}@keyframes fzBurst{to{transform:scale(2.2);opacity:0}}
+.fzp{position:absolute;left:50%;top:42%;width:64px;height:64px;margin:-32px 0 0 -32px;transform:translate(var(--x),var(--y));animation:fzIn 1.25s cubic-bezier(.6,0,.9,.5) forwards}
+.fzp canvas{width:100%;height:100%}
+@keyframes fzIn{0%{transform:translate(var(--x),var(--y)) scale(.4) rotate(0);opacity:0}15%{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}100%{transform:translate(0,0) scale(.2) rotate(720deg);opacity:0}}
+.fzout{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(0);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0}
+.fzout canvas{width:120px;height:120px;filter:drop-shadow(0 0 24px #fff)}
+.fzout b{font:800 22px var(--display);text-shadow:0 2px 10px #000;white-space:nowrap}
+#fuseFx.done .fzout{animation:fzPop .7s cubic-bezier(.2,1.8,.4,1) forwards}
+@keyframes fzPop{to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 </style>
 
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -616,6 +640,11 @@ main{overflow:hidden}
       <div class="sgrid" id="spareGrid"></div>
       <div class="sec">Chest guide</div><div class="cguide" id="chGuide"></div>
     </section>
+    <section class="view" id="forgeView" hidden>
+      <h2>Fuse</h2>
+      <div class="fzhint">Fuse abilities into stronger ones</div>
+      <div id="fuseList"></div>
+    </section>
     <section class="view" id="lbView" hidden>
       <h2>Leaderboard <span class="myw" id="myWorth"></span></h2><div class="seg" id="lbSeg"><button data-m="best">Rarest</button><button data-m="worth">Worth</button></div>
       <div class="namebox"><input id="nameIn" maxlength="16" placeholder="Your name on the board" autocomplete="off"><button class="ghost" id="nameSave">Save</button></div>
@@ -631,6 +660,7 @@ main{overflow:hidden}
     <button class="tab" data-v="rollView" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg><span class="tl">Roll</span></button>
     <button class="tab" data-v="colView" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="8" r="4.5"/><path d="M12.8 11.2 4 20m0 0 2.5 2.5M4 20l-1.5-1.5M7.5 16.5l2 2"/></svg><span class="tl">Keys</span></button>
     <button class="tab" data-v="fuseView" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11h17v8.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M3.5 11V9a5 5 0 0 1 5-5h7a5 5 0 0 1 5 5v2"/><rect x="10" y="9.5" width="4" height="4.5" rx="1"/><path d="M7.5 4.5V11M16.5 4.5V11"/></svg><span class="tl">Chests</span></button>
+    <button class="tab" data-v="forgeView" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/><path d="M12 8.3v7.4"/><path d="M12 2.5v2M12 19.5v2"/></svg><span class="tl">Fuse</span></button>
     <button class="tab" data-v="lbView" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3M12 14v4M8 21h8M9 18h6"/></svg><span class="tl">Leaders</span></button>
   </nav>
 </div>
@@ -646,6 +676,7 @@ main{overflow:hidden}
 <div class="seg" id="fSeg"><button data-m="top">Top</button><button data-m="new">New</button></div><div id="fList"></div></div></div>
 <div id="cPage" hidden><div class="cpbar"><button id="cpBack" aria-label="Back">‹</button><span id="cpTitle"></span></div><div id="cpBody"></div></div>
 <div id="uSheet" class="gsheet" hidden><div class="shbg" id="uBg"></div><div class="shcard" role="dialog" aria-modal="true"><button class="shx" id="uX" aria-label="Close">✕</button><div class="abtitle">Upgrade abilities <span class="myw gemw" id="uGems"></span></div><div id="uBody"></div></div></div>
+<div id="fuseFx" hidden><div id="fzRing"></div></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="flash"></div>
 <div id="ribbonClip"><div id="ribbon"></div></div>
@@ -1698,8 +1729,13 @@ function invInit(){if(S.ablLv){let g=0;const OC=[8,15,25];for(const t in S.ablLv
 const sameAb=(a,b)=>a&&b&&a.type===b.type&&(a.lv|0)===(b.lv|0);
 const ABTYPES=["charge","clover","dice","ltix","mtix","surge","twin","echo","floor","siphon","aura","x5","godly"];
 const ABC={ab:1,el:"abil",n:"Abilities",ic:"✨",d:v=>v,v:["Boosted Rolls ×2.5 · Clovers 25% stronger","+1 ability slot","Twin Spin → Triple Spin · Echo gives 3 copies","Lucky Dice rolls 3× · Godly ×15 · Mega Charge ×7"]};
-const UPG={charge:[2,4,8,10],aura:[3,5,8,10],x5:[5,7,9,10],clover:[1,1.5,2,3]},UCOST=[5,5,5],UPT=["charge","clover","aura","x5"];
+const UPG={charge:[2,4,8,10],aura:[3,5,8,10],x5:[5,7,9,10],clover:[1,1.5,2,3]},UCOST=[3,5,7],UPT=["charge","clover","aura","x5","floor","twin","echo","dice","siphon"];
 function multOf(t,lv){lv=lv|0;if(t==="charge")return lv?UPG.charge[lv]:(abStage()>=1?2.5:2);if(t==="aura")return UPG.aura[lv];if(t==="x5")return Math.max(UPG.x5[lv],abStage()>=4?7:5);if(t==="godly")return abStage()>=4?15:10;return 1}
+const FLOORS=[14,100,1000,10000],floorIdx=thr=>{for(let i=0;i<N;i++)if(ODDS[i]>=thr)return i;return N-1};
+const twinN=(lv,tri)=>tri?2:Math.min(2,1+((lv|0)>=2?1:0)+(abStage()>=3?1:0)),twinL=lv=>[1,2,2,4][lv|0];
+const echoN=lv=>(abStage()>=3?2:1)+(lv|0),diceN=lv=>(abStage()>=4?3:2)+(lv|0),siphV=(v,lv)=>Math.round((v||8)*[1,1.5,2,3][lv|0]);
+function upDesc(it,lv){const t=it.type;switch(t){case"clover":return"+"+cloverV(it.v||15,lv)+"% luck";case"floor":return"1 in "+fmtOdds(FLOORS[lv])+"+";case"twin":return twinN(lv)+" bonus key"+(twinN(lv)>1?"s":"")+(twinL(lv)>1?" · ×"+twinL(lv):"");
+  case"echo":return(echoN(lv)+1)+" copies";case"dice":return"best of "+diceN(lv);case"siphon":return"+"+siphV(it.v,lv)+" storm";default:return"×"+multOf(t,lv)+" luck"}}
 const cloverV=(v,lv)=>Math.round(v*(abStage()>=1?1.25:1)*UPG.clover[lv|0]);const LVN=["","II","III","MAX"];const lvTag=it=>it&&it.lv?" "+LVN[it.lv]:"";
 function abStage(){const n=ABTYPES.filter(t=>S.ablSeen&&S.ablSeen[t]).length;let st=0;[4,8,11,13].forEach(t=>{if(n>=t)st++});return st}
 function addInv(it,noEq){if(it&&it.type&&ABTYPES.includes(it.type)){S.ablSeen=S.ablSeen||{};S.ablSeen[it.type]=1}const o={type:it.type,n:it.n||1};if(it.lv)o.lv=it.lv;if(it.v!=null)o.v=it.v;if(it.el)o.el=it.el;const ex=(!noEq&&S.abl&&S.abl.find(x=>sameAb(x,o)))||S.inv.find(x=>sameAb(x,o));if(ex){ex.n+=o.n;if(o.v!=null)ex.v=Math.max(ex.v||0,o.v)}else S.inv.push(o)}
@@ -1712,14 +1748,16 @@ function ablInfo(it){const n=it.n;switch(it.type){
   case"gems":return{col:"#7af0ff",t:"Gems",d:"+"+n};
   case"charge":return{col:"#ffd54a",t:"Boosted Rolls"+lvTag(it),d:"×"+multOf("charge",it.lv)+" luck · "+n+" roll"+(n>1?"s":"")};
   case"clover":return{col:"#5fe07a",t:"Lucky Clover"+lvTag(it),d:"+"+cloverV(it.v||15,it.lv)+"% luck · "+n+" rolls"};
-  case"dice":return{col:"#7ae7ff",t:"Lucky Dice",d:"roll "+(abStage()>=4?"3 times":"twice")+", keep the best key · "+n+" roll"+(n>1?"s":"")};
+  case"dice":return{col:"#7ae7ff",t:"Lucky Dice"+lvTag(it),d:"roll "+diceN(it.lv)+" times, keep the best key · "+n+" roll"+(n>1?"s":"")};
   case"ltix":return{col:"#7dffa8",t:"Lucky Ticket",d:"next roll becomes Lucky · ×"+n};
   case"mtix":return{col:"#ff7ad8",t:"Mega Ticket",d:"next roll becomes Mega · ×"+n};
   case"surge":return{col:ELCOL.gem,t:"Rank Surge",d:"rank-up ×1.5 · "+n+" climb"+(n>1?"s":"")};
-  case"twin":return abStage()>=3?{col:"#ffd0f0",t:"Triple Spin",d:"roll 2 bonus keys at once · ×"+n}:{col:"#ffd0f0",t:"Twin Spin",d:"roll a bonus key at once · ×"+n};
-  case"echo":return{col:"#b49aff",t:"Echo",d:"get "+(abStage()>=3?3:2)+" copies of what you roll · ×"+n};
-  case"floor":return{col:"#ffb84d",t:"Rarity Floor",d:"next roll is Heroic or better · ×"+n};
-  case"siphon":return{col:"#8ad8ff",t:"Storm Siphon",d:"+"+it.v+" storm charge per roll · "+n+" rolls"};
+  case"twin":return{col:"#ffd0f0",t:(twinN(it.lv)>1?"Triple Spin":"Twin Spin")+lvTag(it),d:"spin "+twinN(it.lv)+" bonus key"+(twinN(it.lv)>1?"s":"")+" at once"+(twinL(it.lv)>1?" · ×"+twinL(it.lv)+" luck":"")+" · ×"+n};
+  case"echo":return{col:"#b49aff",t:"Echo"+lvTag(it),d:"get "+(echoN(it.lv)+1)+" copies of what you roll · ×"+n};
+  case"floor":return{col:"#ffb84d",t:"Rarity Floor"+lvTag(it),d:"next key is 1 in "+fmtOdds(FLOORS[it.lv|0])+" or rarer · ×"+n};
+  case"floor2":return{col:"#c48aff",t:"Mythic Floor",d:"next key is 1 in 25K or rarer · ×"+n};
+  case"tri":return{col:"#ff9ae6",t:"Triple Spin",d:"2 bonus keys at ×3 luck · ×"+n};
+  case"siphon":return{col:"#8ad8ff",t:"Storm Siphon"+lvTag(it),d:"+"+siphV(it.v,it.lv)+" storm charge per roll · "+n+" rolls"};
   case"star":return{col:"#fff27a",t:"Rank Star",d:"+1 rank to a key · ×"+n};
   case"copier":return{col:"#9ef0ff",t:"Key Copy",d:"+1 copy of a key · ×"+n}}}
 function ablIcon(it,px){const cv=document.createElement("canvas");cv.width=cv.height=px*2;const c=cv.getContext("2d");c.translate(px,px*1.06);lootIcon(c,it,px*2*1.3,ablInfo(it).col);return cv}
@@ -1733,11 +1771,12 @@ let abTip=null,tipClosed=0;
 function openAbl(){if(busy)return;const sh=$id("abSheet"),L=$id("abList");L.innerHTML="";abTip=null;
   const sec=(t)=>{const h=document.createElement("div");h.className="absec";h.textContent=t;L.appendChild(h)};
   const box=(it,eq,onTap)=>{const b=document.createElement("div");b.className="abox"+(it?"":" empty")+(eq?" eq":"");b.setAttribute("role","button");b.tabIndex=0;
-    if(it){const inf=ablInfo(it);b.style.setProperty("--ac",inf.col);b.appendChild(ablIcon(it,26));const n=document.createElement("b");n.className="abn";n.textContent="×"+it.n;b.appendChild(n);
+    if(it){const inf=ablInfo(it);b.style.setProperty("--ac",inf.col);b.appendChild(ablIcon(it,26));const n=document.createElement("b");n.className="abn";n.textContent="×"+it.n;b.appendChild(n);const nm=document.createElement("span");nm.className="abnm";nm.textContent=inf.t;nm.style.color=inf.col;b.appendChild(nm);
       const i=document.createElement("button");i.className="abi";i.textContent="i";i.setAttribute("aria-label","About "+inf.t);i.onclick=e=>{e.stopPropagation();showTip(b,inf)};b.appendChild(i)}
     else b.innerHTML='<span class="abplus">+</span>';
     b.onclick=onTap;return b};
   {const ub=document.createElement("button");ub.className="upgbtn";ub.innerHTML="<b>⬆ Upgrade abilities</b><span>💎 "+(S.gems||0)+"</span>";ub.onclick=()=>{closeAbl();setTimeout(openUpg,220)};L.appendChild(ub)}
+  {const AN=ablN(),sl=document.createElement("div");sl.className="abslots";sl.textContent=AN+" ability slots"+(AN>2?"":"")+" · +1 from Abilities collection II · +1 from Clockwork IV";L.appendChild(sl)}
   sec("Equipped");const er=document.createElement("div");er.className="abgrid eqg";const AN=ablN();er.style.gridTemplateColumns="repeat("+AN+",minmax(0,1fr))";while(S.abl.length<AN)S.abl.push(null);
   for(let k=0;k<AN;k++){const it=S.abl[k];er.appendChild(box(it,true,()=>{if(!it)return;S.abl[k]=null;addInv(it,true);save();renderAblBar();updLuck();osc(500,.12,"triangle",.05,0,250);openAbl()}))}L.appendChild(er);
   sec("Inventory");
@@ -1751,11 +1790,11 @@ function openUpg(){const box=$id("uBody");box.innerHTML="";const gems=S.gems||0;
   const note=document.createElement("div");note.className="abempty";note.style.textAlign="left";note.textContent="Upgrades one use at a time.";box.appendChild(note);
   const L=[];S.inv.forEach(it=>{if(UPT.includes(it.type))L.push([it,"inv"])});(S.abl||[]).forEach(it=>{if(it&&UPT.includes(it.type))L.push([it,"eq"])});
   L.sort((a,b)=>UPT.indexOf(a[0].type)-UPT.indexOf(b[0].type)||(a[0].lv|0)-(b[0].lv|0));
-  if(!L.length){const e=document.createElement("div");e.className="abempty";e.textContent="Find Boosted Rolls, Lucky Clovers, Golden Auras or Mega Charges in chests to upgrade them";box.appendChild(e)}
+  if(!L.length){const e=document.createElement("div");e.className="abempty";e.textContent="Open chests to find abilities you can upgrade";box.appendChild(e)}
   L.forEach(([it,where])=>{const t=it.type,lv=it.lv|0,inf=ablInfo(it),row=document.createElement("div");row.className="uprow"+(lv>=3?" max":"");row.style.setProperty("--ac",inf.col);
     row.appendChild(ablIcon(it,22));const tx=document.createElement("div");tx.className="uptx";const nm=document.createElement("b");nm.textContent=inf.t+" ×"+it.n+(where==="eq"?" · equipped":"");nm.style.color=inf.col;
-    const cur=t==="clover"?"+"+cloverV(it.v||15,lv)+"%":"×"+multOf(t,lv),nxt=lv<3?(t==="clover"?"+"+cloverV(it.v||15,lv+1)+"%":"×"+multOf(t,lv+1)):null;
-    const ln=document.createElement("span");const a1=document.createElement("em");a1.textContent=cur+" luck";ln.appendChild(a1);if(nxt){ln.appendChild(document.createTextNode(" → "));const z=document.createElement("strong");z.textContent=nxt+" luck";ln.appendChild(z)}else ln.appendChild(document.createTextNode(" · MAX"));
+    const cur=upDesc(it,lv),nxt=lv<3?upDesc(it,lv+1):null;
+    const ln=document.createElement("span");const a1=document.createElement("em");a1.textContent=cur;ln.appendChild(a1);if(nxt){ln.appendChild(document.createTextNode(" → "));const z=document.createElement("strong");z.textContent=nxt;ln.appendChild(z)}else ln.appendChild(document.createTextNode(" · MAX"));
     const pips=document.createElement("i");pips.className="uppips";for(let q=0;q<3;q++){const d=document.createElement("u");if(q<lv)d.className="on";pips.appendChild(d)}tx.append(nm,ln,pips);row.appendChild(tx);
     const bt=document.createElement("button");bt.className="fbtn upb";if(lv>=3){bt.textContent="MAX";bt.disabled=true}else{const cost=UCOST[lv];bt.textContent="+1 · 💎"+cost;if(gems<cost)bt.disabled=true;bt.onclick=()=>doUpg(it,row)}row.appendChild(bt);box.appendChild(row)});
   gOpen("uSheet")}
@@ -1763,7 +1802,7 @@ function doUpg(it,row){const lv=it.lv|0,cost=UCOST[lv];if(lv>=3||(S.gems||0)<cos
   it.n--;if(it.n<=0){const i=S.inv.indexOf(it);if(i>=0)S.inv.splice(i,1);else{const k=S.abl.indexOf(it);if(k>=0)S.abl[k]=null}}
   const up={type:it.type,n:1,lv:lv+1};if(it.v!=null)up.v=it.v;addInv(up,true);save();
   const r=row.getBoundingClientRect(),col=ablInfo(up).col,x=r.left+30,y=r.top+r.height/2;boom(50,[col,"#fff","#7af0ff"],8,x,y);ring(col,5,5,x,y);flash(.25,200,col);SFX.bell([79,83,86,91],.06);SFX.sparkle(8,.05);vib([30,20,60]);shakeAmt=6;
-  openUpg();renderAblBar();toast(ablInfo(up).t+" ready · "+(up.type==="clover"?"+"+cloverV(up.v||15,up.lv)+"%":"×"+multOf(up.type,up.lv))+" luck")}
+  openUpg();renderAblBar();toast(ablInfo(up).t+" ready · "+upDesc(up,up.lv))}
 function closeAbl(e){if(e&&performance.now()-tipClosed<500)return;const sh=$id("abSheet");sh.classList.remove("on");setTimeout(()=>{if(!sh.classList.contains("on"))sh.hidden=true},200)}
 function equipAbl(it){let k=S.abl.findIndex(x=>sameAb(x,it));if(k>=0){S.abl[k].n+=it.n;if(it.v!=null)S.abl[k].v=Math.max(S.abl[k].v||0,it.v);S.inv.splice(S.inv.indexOf(it),1);save();renderAblBar();updLuck();openAbl();SFX.bell([79,83,86],.05);return}
   {const AN=ablN();while(S.abl.length<AN)S.abl.push(null);k=S.abl.findIndex((x,i)=>!x&&i<AN);if(k<0){const o=S.abl[0];S.abl.splice(0,1);S.abl.splice(AN-1,0,null);addInv(o,true);k=AN-1}}
@@ -2065,10 +2104,11 @@ async function doRoll(){
   const shadowR=!stormMode&&Math.random()<collVal("shadow")/100;
   const rollL=(luck===10?(stormMode?stormMode.luck:10)+RBf.mega:luck)*RBf.luck*boost*(shadowR?10:1);let tier=rollTier(rollL,RBf);ROLLT=rollL;
   const fk=t=>{const k=useAblSlot(t);if(k<0)return null;const it={...S.abl[k]};spendAbl(k);return[k,it]};
-  const fDice=fk("dice");if(fDice){const dn=abStage()>=4?3:2;firedCopy.push([fDice[0],fDice[1],dn===3?"🎲 ROLL 3×":"🎲 ROLL TWICE"]);for(let q=1;q<dn;q++){const t2=rollTier(rollL,RBf);if(t2>tier)tier=t2}}
-  const fFloor=fk("floor"),fTwin=fk("twin"),fEcho=fk("echo"),fSiph=fk("siphon");
-  if(fFloor){firedCopy.push([fFloor[0],fFloor[1],"RARITY FLOOR!"]);{const FL=OLD2NEW[12];for(let q=0;q<2000&&tier<FL;q++)tier=rollTier(rollL*4,RBf);if(tier<FL)tier=FL+Math.floor(Math.random()*4)}}
-  const sideT=fTwin?[...Array(abStage()>=3?2:1)].map(()=>rollTier(rollL,RBf)):null;if(fTwin)firedCopy.push([fTwin[0],fTwin[1],sideT.length>1?"TRIPLE SPIN!":"TWIN SPIN!"]);if(fEcho)firedCopy.push([fEcho[0],fEcho[1],"ECHO!"]);if(fSiph){firedCopy.push([fSiph[0],fSiph[1],"+"+fSiph[1].v+" ⚡ STORM"]);S.stormBar=Math.min(STORM_MAX,(S.stormBar||0)+fSiph[1].v)}
+  const fDice=fk("dice");if(fDice){const dn=diceN(fDice[1].lv);firedCopy.push([fDice[0],fDice[1],"🎲 BEST OF "+dn]);for(let q=1;q<dn;q++){const t2=rollTier(rollL,RBf);if(t2>tier)tier=t2}}
+  const fFloor2=fk("floor2"),fFloor=fFloor2?null:fk("floor"),fTri=fk("tri"),fTwin=fTri?null:fk("twin"),fEcho=fk("echo"),fSiph=fk("siphon");
+  if(fFloor2){firedCopy.push([fFloor2[0],fFloor2[1],"MYTHIC FLOOR!"]);const FL=floorIdx(25000);for(let q=0;q<3000&&tier<FL;q++)tier=Math.max(tier,rollTier(rollL*8,RBf));if(tier<FL)tier=FL+Math.floor(Math.random()*3)}
+  if(fFloor){firedCopy.push([fFloor[0],fFloor[1],"RARITY FLOOR!"]);{const FL=floorIdx(FLOORS[fFloor[1].lv|0]);for(let q=0;q<2000&&tier<FL;q++)tier=rollTier(rollL*4,RBf);if(tier<FL)tier=FL+Math.floor(Math.random()*4)}}
+  const fSp=fTri||fTwin,sideT=fSp?[...Array(twinN(fSp[1].lv,!!fTri))].map(()=>rollTier(rollL*(fTri?3:twinL(fSp[1].lv)),RBf)):null;if(fSp)firedCopy.push([fSp[0],fSp[1],sideT.length>1?"TRIPLE SPIN!":"TWIN SPIN!"]);if(fEcho)firedCopy.push([fEcho[0],fEcho[1],"ECHO!"]);if(fSiph){const sv=siphV(fSiph[1].v,fSiph[1].lv);firedCopy.push([fSiph[0],fSiph[1],"+"+sv+" ⚡ STORM"]);S.stormBar=Math.min(STORM_MAX,(S.stormBar||0)+sv)}
   const b=fxBand(tier);
   SFX.press();duck(true);vib(12);$id("holdBtn").hidden=true;
   if(firedCopy.length){await Promise.all(firedCopy.map(([k,it,l],q)=>sleep(q*80).then(()=>ablPop(it,l,k))));await sleep(120)}renderAblBar();
@@ -2086,7 +2126,7 @@ async function doRoll(){
   updHeader();save();
   holdNext=!isNew&&gradeOf(tier)<MAXG;
   if(!fEcho&&Math.random()<collVal("water")/100){S.counts[tier]++;setTimeout(()=>floatChip("TIDAL +1 "+keyName(tier),ELCOL.water),900)}
-  if(fEcho){const ex=abStage()>=3?2:1;S.counts[tier]+=ex;setTimeout(()=>{floatChip("ECHO +"+ex+" "+keyName(tier),"#b49aff");const d=dialC();for(let q=0;q<3;q++)setTimeout(()=>ring("#b49aff",4+q,4,d.x,d.y),q*120);osc(660,.3,"sine",.05);osc(660,.3,"sine",.03,.15);osc(660,.3,"sine",.015,.3)},900)}
+  if(fEcho){const ex=echoN(fEcho[1].lv);S.counts[tier]+=ex;setTimeout(()=>{floatChip("ECHO +"+ex+" "+keyName(tier),"#b49aff");const d=dialC();for(let q=0;q<3;q++)setTimeout(()=>ring("#b49aff",4+q,4,d.x,d.y),q*120);osc(660,.3,"sine",.05);osc(660,.3,"sine",.03,.15);osc(660,.3,"sine",.015,.3)},900)}
   if(stormMode){const d=dialC();for(let q=0;q<6;q++)strike(d,q%2?"#ffffff":"#8ad8ff");thunder(.5);if(stormFx)stormFx.flash=.6;shakeAmt=14}
   await celebrate(tier,b,isNew,luck);
   if(totemEl&&elemIdx(tier)===totemEl){floatChip(ELNAME[totemEl]+" Totem!",ELCOL[totemEl]);ring(ELCOL[totemEl],6,5,dialC().x,dialC().y)}
@@ -2640,7 +2680,8 @@ function lootIcon(c,it,w,col){const OL="#170b04",lw=w*.035;c.save();c.lineJoin="
   case"charge":{const P=[[.08,-.36],[-.2,.04],[-.02,.04],[-.1,.36],[.22,-.06],[.03,-.06]];c.beginPath();P.forEach(([x,y],i)=>i?c.lineTo(x*w,y*w):c.moveTo(x*w,y*w));c.closePath();
     const g=c.createLinearGradient(0,-w*.36,0,w*.36);g.addColorStop(0,"#fffbd0");g.addColorStop(.45,"#ffd54a");g.addColorStop(1,"#ff8a1a");c.fillStyle=g;c.fill();out();
     c.beginPath();c.moveTo(.05*w,-.28*w);c.lineTo(-.12*w,.02*w);c.strokeStyle="rgba(255,255,255,.8)";c.lineWidth=lw*.8;c.stroke();
-    c.fillStyle="#fff";for(const [x,y] of [[-.28,-.2],[.3,.18],[.26,-.3]]){star(c,x*w,y*w,w*.05,4,.3);c.fill()}break}
+    c.fillStyle="#fff";for(const [x,y] of [[-.28,-.2],[.3,.18],[.26,-.3]]){star(c,x*w,y*w,w*.05,4,.3);c.fill()}
+    {const L="×"+multOf("charge",it.lv);c.font=`400 ${w*.17}px 'Luckiest Guy',Impact,sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineWidth=lw*1.6;c.strokeStyle=OL;c.strokeText(L,w*.2,w*.3);c.fillStyle="#fff6c0";c.fillText(L,w*.2,w*.3)}break}
   case"clover":{c.rotate(.3);for(let q=0;q<4;q++){c.save();c.rotate(q*Math.PI/2+Math.PI/4);leafPath(c,w*.2);const g=c.createRadialGradient(-w*.05,-w*.15,1,0,-w*.1,w*.2);g.addColorStop(0,"#d8ffb0");g.addColorStop(.5,"#5fe07a");g.addColorStop(1,"#1f8a3a");c.fillStyle=g;c.fill();out();c.restore()}
     c.beginPath();c.arc(0,0,w*.045,0,7);c.fillStyle="#fff6c8";c.fill();out();shine(-w*.12,-w*.12,w*.05,w*.025);
     c.rotate(-.3);c.fillStyle="#fff";c.font=`900 ${w*.13}px Manrope,sans-serif`;c.textAlign="center";c.textBaseline="middle";c.lineWidth=lw*1.2;c.strokeStyle=OL;c.strokeText("+"+(it.v||"%"),w*.2,w*.28);c.fillText("+"+(it.v||"%"),w*.2,w*.28);break}
@@ -2655,11 +2696,11 @@ function lootIcon(c,it,w,col){const OL="#170b04",lw=w*.035;c.save();c.lineJoin="
     c.setLineDash([w*.03,w*.025]);c.beginPath();c.moveTo(-tw*.2,-th/2+lw);c.lineTo(-tw*.2,th/2-lw);c.strokeStyle="rgba(0,0,0,.45)";c.lineWidth=lw*.6;c.stroke();c.setLineDash([]);
     c.fillStyle="#fff";star(c,-tw*.34,0,th*.18,5,.45);c.fill();out();c.fillStyle=OL;c.font=`400 ${w*.13}px 'Luckiest Guy',Impact,sans-serif`;c.textAlign="center";c.textBaseline="middle";c.fillText(M?"MEGA":"LUCKY",tw*.12,1);shine(-tw*.1,-th*.3,tw*.3,th*.06,0);break}
   case"surge":{for(let q=0;q<3;q++){const y=w*(.18-q*.16),g=c.createLinearGradient(0,y-w*.1,0,y+w*.06);g.addColorStop(0,"#ffd0ea");g.addColorStop(1,"#ff4da6");c.fillStyle=g;c.beginPath();c.moveTo(-w*.26,y+w*.05);c.lineTo(0,y-w*.17);c.lineTo(w*.26,y+w*.05);c.lineTo(w*.17,y+w*.11);c.lineTo(0,y-w*.04);c.lineTo(-w*.17,y+w*.11);c.closePath();c.fill();out()}break}
-  case"twin":{for(const [x,r] of [[-.1,-.25],[.1,.25]]){c.save();c.translate(x*w,0);c.rotate(r);rr(c,-w*.14,-w*.2,w*.28,w*.4,w*.05);const g=c.createLinearGradient(0,-w*.2,0,w*.2);g.addColorStop(0,"#fff");g.addColorStop(1,col);c.fillStyle=g;c.fill();c.beginPath();rr(c,-w*.14,-w*.2,w*.28,w*.4,w*.05);out();c.fillStyle=OL;star(c,0,0,w*.08,5,.45);c.fill();c.restore()}
-    c.fillStyle="#fff";c.font=`900 ${w*.14}px Manrope,sans-serif`;c.textAlign="center";c.lineWidth=lw*1.2;c.strokeStyle=OL;c.strokeText("×2",w*.22,w*.32);c.fillText("×2",w*.22,w*.32);break}
+  case"twin":case"tri":{for(const [x,r] of [[-.1,-.25],[.1,.25]]){c.save();c.translate(x*w,0);c.rotate(r);rr(c,-w*.14,-w*.2,w*.28,w*.4,w*.05);const g=c.createLinearGradient(0,-w*.2,0,w*.2);g.addColorStop(0,"#fff");g.addColorStop(1,col);c.fillStyle=g;c.fill();c.beginPath();rr(c,-w*.14,-w*.2,w*.28,w*.4,w*.05);out();c.fillStyle=OL;star(c,0,0,w*.08,5,.45);c.fill();c.restore()}
+    c.fillStyle="#fff";c.font=`900 ${w*.14}px Manrope,sans-serif`;c.textAlign="center";c.lineWidth=lw*1.2;c.strokeStyle=OL;{const L=it.type==="tri"?"×3":"×"+(twinN(it.lv)+1);c.strokeText(L,w*.22,w*.32);c.fillText(L,w*.22,w*.32)}break}
   case"echo":{c.strokeStyle=col;for(let q=0;q<3;q++){c.globalAlpha=1-q*.28;c.lineWidth=lw*1.6;c.beginPath();c.arc(0,0,w*(.14+q*.09),-1,1);c.stroke();c.beginPath();c.arc(0,0,w*(.14+q*.09),Math.PI-1,Math.PI+1);c.stroke()}c.globalAlpha=1;
     c.save();c.scale(w*.0042,w*.0042);c.translate(-50,-50);drawKey(c,13,T,{x:50,y:50,s:.75,noFx:true});c.restore();break}
-  case"floor":{c.beginPath();c.moveTo(0,-w*.32);c.lineTo(w*.26,-w*.2);c.lineTo(w*.22,w*.12);c.quadraticCurveTo(0,w*.34,-w*.22,w*.12);c.lineTo(-w*.26,-w*.2);c.closePath();const g=c.createLinearGradient(0,-w*.32,0,w*.3);g.addColorStop(0,"#fff8d0");g.addColorStop(.5,"#ffb84d");g.addColorStop(1,"#c06a00");c.fillStyle=g;c.fill();out();
+  case"floor":case"floor2":{c.beginPath();c.moveTo(0,-w*.32);c.lineTo(w*.26,-w*.2);c.lineTo(w*.22,w*.12);c.quadraticCurveTo(0,w*.34,-w*.22,w*.12);c.lineTo(-w*.26,-w*.2);c.closePath();const g=c.createLinearGradient(0,-w*.32,0,w*.3);if(it.type==="floor2"){g.addColorStop(0,"#f6e8ff");g.addColorStop(.5,"#c48aff");g.addColorStop(1,"#5a1aa8")}else{g.addColorStop(0,"#fff8d0");g.addColorStop(.5,"#ffb84d");g.addColorStop(1,"#c06a00")};c.fillStyle=g;c.fill();out();
     c.fillStyle=OL;c.beginPath();c.moveTo(0,-w*.18);c.lineTo(w*.12,-w*.02);c.lineTo(w*.05,-w*.02);c.lineTo(w*.05,w*.13);c.lineTo(-w*.05,w*.13);c.lineTo(-w*.05,-w*.02);c.lineTo(-w*.12,-w*.02);c.closePath();c.fill();shine(-w*.1,-w*.18,w*.06,w*.03);break}
   case"godly":case"x5":case"aura":{const L="×"+multOf(it.type,it.lv),C2={godly:["#ffffff","#ffe27a","#c98a00"],x5:["#f6e8ff","#c48aff","#5a1aa8"],aura:["#fff6d0","#ffcf5a","#b06a00"]}[it.type];
     if(it.type!=="aura"){c.save();c.rotate(T*.6);c.globalCompositeOperation="lighter";for(let q=0;q<12;q++){c.rotate(Math.PI/6);c.fillStyle=colA(col,.35);c.beginPath();c.moveTo(0,0);c.lineTo(w*.48,-w*.05);c.lineTo(w*.48,w*.05);c.fill()}c.restore()}
@@ -2791,7 +2832,7 @@ function drawChestFx(){if(!chestFx)return;chestFx.vt+=(T-chestFx.lt)*(chSkip?5:1
 
 
 /* ================= NAV ================= */
-const VIEWS=["rollView","colView","fuseView","lbView"];let curView="rollView",navT=null;
+const VIEWS=["rollView","colView","fuseView","forgeView","lbView"];let curView="rollView",navT=null;
 function placePill(b,anim){const p=$id("navPill"),nb=b.parentElement.getBoundingClientRect(),r=b.getBoundingClientRect();if(!anim){p.style.transition="none"}p.style.width=r.width+"px";p.style.transform=`translateX(${r.left-nb.left}px)`;if(!anim){void p.offsetWidth;p.style.transition=""}else{p.classList.remove("go");void p.offsetWidth;p.classList.add("go")}}
 function stagger(v){const els=[...$id(v).querySelectorAll(".card,.scard,.eqslot,.lrow,.sec")].slice(0,18);els.forEach((el,k)=>{el.classList.remove("stag");el.style.animationDelay=(k*14)+"ms";void el.offsetWidth;el.classList.add("stag")})}
 document.querySelectorAll("nav .tab").forEach(b=>b.onclick=()=>{
@@ -2810,6 +2851,7 @@ document.querySelectorAll("nav .tab").forEach(b=>b.onclick=()=>{
   if(to==="rollView"){updLuck();shown=S.hat;setInfo(shown,"",false);requestAnimationFrame(()=>{fit();dialV=9;pulse=1;const d=dialC();ring(GOLD,5,3,d.x,d.y)})}
   if(to==="colView"&&!renderCol())stag=false;
   if(to==="fuseView")renderChests();
+  if(to==="forgeView")renderFuse();
   if(to==="lbView")renderLB();
   if(to!=="rollView"&&stag)stagger(to);
 });
@@ -2886,6 +2928,34 @@ function openPlayer(d,ix){const box=$id("pBody");box.innerHTML="";const cleanI=(
   if(Array.isArray(d.eq)&&d.eq.length){box.appendChild(el("div","psec","Equipped"));const eg=el("div","peq");d.eq.slice(0,3).forEach((r,k)=>{r=cleanI(r,N);if(r==null)return;const b=el("div","pek");b.appendChild(iconCanvas(r,false,cleanI((d.eqg||[])[k],MAXG+1)??0,40));const n=el("span",null,keyName(r));n.style.color=tierCSS(r);b.appendChild(n);eg.appendChild(b)});box.appendChild(eg)}
   gOpen("pSheet")}
 $id("pBg").onclick=()=>gClose("pSheet");$id("pX").onclick=()=>gClose("pSheet");
+/* ================= FUSE (abilities) ================= */
+const FUSES=[
+ {in:[["charge",5]],out:{type:"aura",n:3}},
+ {in:[["aura",4]],out:{type:"x5",n:1}},
+ {in:[["x5",3]],out:{type:"godly",n:1}},
+ {in:[["twin",3]],out:{type:"tri",n:1}},
+ {in:[["floor",3]],out:{type:"floor2",n:1}},
+ {in:[["ltix",3]],out:{type:"mtix",n:1}},
+ {in:[["clover",6],["dice",2]],out:{type:"dice",n:2,lv:2}}];
+const haveAb=t=>S.inv.filter(x=>x.type===t).reduce((a,x)=>a+x.n,0)+(S.abl||[]).filter(x=>x&&x.type===t).reduce((a,x)=>a+x.n,0);
+function takeAb(t,n){const L=[...S.inv.filter(x=>x.type===t),...(S.abl||[]).filter(x=>x&&x.type===t)].sort((a,b)=>(a.lv|0)-(b.lv|0));for(const it of L){if(n<=0)break;const k=Math.min(n,it.n);it.n-=k;n-=k;if(it.n<=0){const i=S.inv.indexOf(it);if(i>=0)S.inv.splice(i,1);else{const j=S.abl.indexOf(it);if(j>=0)S.abl[j]=null}}}}
+function renderFuse(){const box=$id("fuseList");if(!box)return;box.innerHTML="";
+  FUSES.forEach((f,fi)=>{const ok=f.in.every(([t,n])=>haveAb(t)>=n),row=document.createElement("div");row.className="fzrow"+(ok?" ok":"");const oinf=ablInfo(f.out);row.style.setProperty("--ac",oinf.col);
+    const ins=document.createElement("div");ins.className="fzin";f.in.forEach(([t,n])=>{const c=document.createElement("div");c.className="fzi"+(haveAb(t)>=n?"":" lack");c.appendChild(ablIcon({type:t,n:1,v:20},16));const s2=document.createElement("b");s2.textContent=Math.min(haveAb(t),n)+"/"+n;c.appendChild(s2);ins.appendChild(c)});
+    const ar=document.createElement("div");ar.className="fzar";ar.textContent="➜";
+    const out=document.createElement("div");out.className="fzo";out.appendChild(ablIcon(f.out,20));const on=document.createElement("span");on.textContent=oinf.t+(f.out.n>1?" ×"+f.out.n:"");on.style.color=oinf.col;out.appendChild(on);
+    const bt=document.createElement("button");bt.className="fbtn fzb";bt.textContent="FUSE";bt.disabled=!ok;bt.onclick=()=>doFuse(fi);
+    row.append(ins,ar,out,bt);box.appendChild(row)})}
+async function doFuse(fi){const f=FUSES[fi];if(busy||!f.in.every(([t,n])=>haveAb(t)>=n))return;busy=true;lockUI(true);
+  f.in.forEach(([t,n])=>takeAb(t,n));const out={...f.out};addInv(out,true);save();
+  const ov=$id("fuseFx"),ring2=$id("fzRing");ov.innerHTML="";ov.appendChild(ring2);ov.hidden=false;ov.classList.remove("go","done");void ov.offsetWidth;
+  const parts2=[];f.in.forEach(([t,n])=>{for(let q=0;q<Math.min(n,4);q++)parts2.push(t)});const cx=W()/2,cy=H()*.42,R2=Math.min(W(),H())*.32;
+  parts2.forEach((t,k)=>{const a=k/parts2.length*Math.PI*2-Math.PI/2,el=document.createElement("div");el.className="fzp";el.appendChild(ablIcon({type:t,n:1,v:20},26));el.style.setProperty("--x",(Math.cos(a)*R2)+"px");el.style.setProperty("--y",(Math.sin(a)*R2)+"px");el.style.animationDelay=(k*40)+"ms";ov.appendChild(el)});
+  const oc=document.createElement("div");oc.className="fzout";oc.appendChild(ablIcon(out,46));const ot=document.createElement("b");const oinf=ablInfo(out);ot.textContent=oinf.t+(out.n>1?" ×"+out.n:"");ot.style.color=oinf.col;oc.appendChild(ot);ov.appendChild(oc);
+  ov.classList.add("go");SFX.riser(1.2,.14);SFX.whoosh(true,.5,.2);for(let q=0;q<6;q++)setTimeout(()=>{ring(oinf.col,3+q,4,cx,cy);converge(4,[oinf.col,"#fff"],260,cx,cy);osc(300+q*90,.12,"triangle",.04,0,600+q*120)},q*170);
+  await sleep(1250);flash(1,420,"#fff");shakeAmt=18;vib([80,40,160]);SFX.impact(5);SFX.bell([79,83,86,91,95],.07);SFX.choir([62,66,69,74],1.6,.05);boom(120,[oinf.col,"#fff",GOLD],11,cx,cy);for(let q=0;q<4;q++)setTimeout(()=>ring(q%2?"#fff":oinf.col,6+q*2,9,cx,cy),q*80);
+  ov.classList.add("done");await sleep(1500);ov.classList.remove("go","done");ov.hidden=true;busy=false;lockUI(false);renderFuse();renderAblBar();toast("Fused "+oinf.t+"!")}
+$id("fuseFx").onclick=()=>{};
 /* ================= FEEDBACK BOARD ================= */
 let fbUnsub=null,fbPosts=[],fbSort="top",fbOpenC=null,fbCUnsub=null,fbLast=0;
 const myName=()=>(S.name||"").slice(0,16)||("Keeper #"+(uid?uid.slice(-4):"????"));
@@ -2921,20 +2991,10 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.4.2";
+const VERSION="2.5.1";
 const NOTES=[
- {v:"2.4.2",d:"Oct 7, 2026",i:["Every ability upgrade now costs just 💎5"]},
- {v:"2.4.1",d:"Oct 7, 2026",i:["Ability upgrades now upgrade one use at a time and cost less: 💎5, then 9, then 15","Boosted Rolls ×2→×4→×8→×10, Golden Aura up to ×10, Mega Charge up to ×10, Lucky Clover up to ×3 power","Gems spent on the old upgrades were refunded"]},
- {v:"2.4",d:"Oct 7, 2026",i:["30 new keys: 15 new common keys and 15 ultra-rare keys up to 1 in 1 Billion","New Abilities collection: find ability types to unlock a bonus slot, Triple Spin, 3-copy Echo, 3× Lucky Dice and stronger boosters","Twin Spin now spins a second dial next to the main one. Triple Spin spins two","Chests: cards flip to reveal loot, the chest zooms in as it shakes, the lid bounces open, and a solid 3D key","Chest guide in the Chests tab shows which keys open which chest","Common keys (under 1 in 100) no longer get the big animations"]},
- {v:"2.3",d:"Oct 6, 2026",i:["Clockwork IV now gives you a 3rd ability slot","Every Stage IV perk is much stronger: Inferno +75% luck, Permafrost ×6, Stormcaller +250%, Tidal 60%, Wildbloom 2 bonus items per chest, Gemcutter +100% rank-up, Starborn +50 Mega luck, Voidwalker 25%, Midas +300% chest luck"]},
- {v:"2.2.1",d:"Oct 6, 2026",i:["Fixed the light sitting on the left side of the screen","Faster tab switching, no more two tabs at once"]},
- {v:"2.2",d:"Oct 6, 2026",i:["Collection pages: tap a collection to see every stage and upgrade it","Swapping keys: tap a key, then tap the slot to swap. Tap anywhere else to cancel","Tap an equipped key twice to unequip it","Chests open on a hinge and the key spins in 3D","Smoother tab switching","Rarity build-up shows the rarity climbing instead of random words","Cleaner top bar: rolls and best moved to your profile in Leaders","Gems are rarer, and you always see exactly how many you got"]},
- {v:"2.1",d:"Oct 6, 2026",i:["Feedback board: post ideas and bugs, like and comment on other people's posts","Gem rewards now show the exact number of gems you get"]},
- {v:"2.0.3",d:"Oct 6, 2026",i:["Gems are much rarer: not every chest has them, and they come 1–3 at a time"]},
- {v:"2.0.2",d:"Oct 6, 2026",i:["Rebalanced rare boosters: rare, but findable","Golden Aura from Iron chests up, Mega Charge from Golden up, Godly Charm from Crystal up"]},
- {v:"2.0",d:"Oct 6, 2026",i:["Brand new Clash-style chests","Gems: find them in chests","Transcend: spend 30 gems on a Celestial key to unlock that element's Collection IV","Rare boosters: Golden Aura ×3, Mega Charge ×5, Godly Charm ×10","All luck stacks: Storm ×25 + a ×2 booster = ×50","New leaderboard: tap anyone to see their profile","Patch notes + automatic updates","Fixed chests disappearing and the lag crash"]},
- {v:"1.9",d:"Oct 6, 2026",i:["Key Roll is on its own site: add it to your home screen","Intro with sound","Cloud saves + save codes","Full-screen layout, no more zooming"]},
- {v:"1.8",d:"Oct 6, 2026",i:["Ascendant Key: get it to Celestial for Collection IV everywhere","Tap a key twice to equip it"]},
+ {v:"2.5.1",d:"Oct 7, 2026",i:["30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: fuse abilities into stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time for 💎3, then 5, then 7: Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
+ {v:"2.3",d:"Oct 6, 2026",i:["Key Roll got its own site: add it to your home screen, with an intro, cloud saves and save codes","Clash-style chests, gems and Transcending for Collection IV","Rare boosters: Golden Aura, Mega Charge, Godly Charm. All luck stacks","Ascendant Key and Collection IV, with a 3rd ability slot from Clockwork IV","Collection pages, key swapping and tap-twice to equip or unequip","New leaderboard with player profiles, plus a feedback board","Patch notes and automatic updates","Lots of fixes: full-screen layout, lag, chests vanishing, smoother tabs"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
  {v:"1.6",d:"Oct 4, 2026",i:["Chests and abilities","Equip keys for buffs"]}];
 function openNotes(){const box=$id("nBody");box.innerHTML="";NOTES.forEach((n,k)=>{const sec=document.createElement("div");sec.className="nv"+(k===0?" new":"");const hd=document.createElement("div");hd.className="nvh";const b=document.createElement("b");b.textContent="v"+n.v;const sp=document.createElement("span");sp.textContent=n.d+(k===0?" · NEW":"");hd.append(b,sp);sec.appendChild(hd);const ul=document.createElement("ul");n.i.forEach(t=>{const li=document.createElement("li");li.textContent=t;ul.appendChild(li)});sec.appendChild(ul);box.appendChild(sec)});gOpen("nSheet")}
