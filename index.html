@@ -1876,7 +1876,7 @@ function showTip(b,inf){const L=$id("abList");if(abTip){abTip.remove();if(abTip.
   const t=document.createElement("div");t.className="abtip";t._b=b;t.innerHTML="<b></b><span></span>";t.firstChild.textContent=inf.t;t.firstChild.style.color=inf.col;t.lastChild.textContent=inf.d;
   setTimeout(()=>{const off=e=>{if(abTip&&!(e.target.classList&&e.target.classList.contains("abi"))){abTip.remove();abTip=null;tipClosed=performance.now()}removeEventListener("pointerdown",off,true)};addEventListener("pointerdown",off,true)},0);const lr=L.getBoundingClientRect(),br=b.getBoundingClientRect();t.style.top=(br.bottom-lr.top+L.scrollTop+6)+"px";t.style.left=Math.max(4,Math.min(lr.width-214,br.left-lr.left+br.width/2-105))+"px";L.appendChild(t);abTip=t;SFX.pop()}
 function renderUpg(box){box.innerHTML="";const gems=S.gems||0;S.ulv=S.ulv||{};
-  const L=UPT.filter(t=>haveAb(t)>0||S.ulv[t]);
+  const L=UPT.filter(t=>haveAb(t)>0||S.ulv[t]||(S.ablSeen&&S.ablSeen[t]));
   if(!L.length){const e=document.createElement("div");e.className="abempty";e.textContent="Open chests to find abilities you can upgrade";box.appendChild(e)}
   L.forEach(t=>{const lv=S.ulv[t]|0,src=[...S.inv,...(S.abl||[])].find(x=>x&&x.type===t),it={type:t,n:haveAb(t),lv,v:src&&src.v!=null?src.v:{clover:15,siphon:8}[t]},inf=ablInfo(it),row=document.createElement("div");row.className="uprow"+(lv>=3?" max":"");row.style.setProperty("--ac",inf.col);
     row.appendChild(ablIcon(it,22));const tx=document.createElement("div");tx.className="uptx";const nm=document.createElement("b");nm.textContent=inf.t+(it.n?" · ×"+it.n:"");nm.style.color=inf.col;
@@ -2475,7 +2475,7 @@ function elemOf(ref){const t=keyTheme(ref),g=sd(ref)>=16?t.gk:t.k;
 function elemIdx(i){if(!ELEM){ELEM=[];for(let k=0;k<N;k++)ELEM.push(elemOf(k))}return ELEM[i]}
 function keyBuff0(ref,mul){if(ref==null)return null;const F=isFusion(ref),n=num(ref),b=band(n),g=F?0:gradeOf(ref),el=F?elemOf(ref):elemIdx(ref);
   const s=[1,1.6,2.4,3.4,4.6,6,8,10][Math.min(7,b)]*(isTrans(ref)?20:RMUL[g])*(F?1.5:1)*(mul||1);
-  const cm=isTrans(ref)?3:1;const type={gem:"rank",fire:"luck",storm:"luck",cosmic:"luck",nature:"aff",water:"aff",frost:"aff",shadow:"mega",time:"lucky",gold:"chest"}[el]||(Math.floor(sd(ref))%2?"luck":"chest");
+  const cm=(isTrans(ref)?3:1)*(mul>1?2:1);const type={gem:"rank",fire:"luck",storm:"luck",cosmic:"luck",nature:"aff",water:"aff",frost:"aff",shadow:"mega",time:"lucky",gold:"chest"}[el]||(Math.floor(sd(ref))%2?"luck":"chest");
   let val,txt;
   if(type==="luck"){val=Math.min(250*cm,Math.round(2.5*s*(el==="cosmic"?1.3:1)));txt="+"+val+"% Luck"}
   else if(type==="rank"){val=Math.min(150*cm,Math.round(3*s));txt="+"+val+"% Rank-up"}
@@ -2484,10 +2484,10 @@ function keyBuff0(ref,mul){if(ref==null)return null;const F=isFusion(ref),n=num(
   else if(type==="lucky"){val=Math.min(5,Math.round(.4+s*.35));txt="Lucky rolls "+val+" sooner"}
   else{val=Math.min(300*cm,Math.round(8*s));txt="+"+val+"% Chest luck"}
   return{type,val,el,txt,col:ELCOL[el],rm:RMUL[g],g}}
-const FZM=1.3;
+const FZM=2;
 function keyBuff(ref){const z=isFusion(ref)&&FUSION_BY[ref];if(!z||z.a==null)return keyBuff0(ref);
   const A=keyBuff0(z.a,FZM),Bb=keyBuff0(z.b,FZM);if(A.type===Bb.type&&A.el===Bb.el){const o=keyBuff0(z.b,FZM*2);o.fz=1;return o}
-  return{type:"multi",parts:[Bb,A],val:0,el:Bb.el,txt:Bb.txt+" + "+A.txt,col:Bb.col,rm:1,g:0,fz:1}}
+  return{type:"multi",parts:[Bb,A],val:0,el:Bb.el,txt:Bb.txt+" · "+A.txt,col:Bb.col,rm:1,g:0,fz:1}}
 function buffs(){const B={luck:1,rank:1,aff:{},mega:0,lucky:10,chest:1};
   (S.equip||[]).forEach(r=>{if(haveCount(r)<=0)return;const k0=keyBuff(r);(k0.parts||[k0]).forEach(k=>{
     if(k.type==="luck")B.luck+=k.val/100;else if(k.type==="rank")B.rank+=k.val/100;else if(k.type==="aff")B.aff[k.el]=(B.aff[k.el]||1)*k.val;
@@ -2499,7 +2499,7 @@ function buffSummary(){const B=buffs(),o=[];if(B.luck>1)o.push(["+"+Math.round((
 
 /* ================= FUSION KEYS ================= */
 function FZW(s){return s.replace(/\bKey\b/g,"").split(/\s+/).filter(w=>w&&!/^(the|of|to|a|&)$/i.test(w))}
-function fzSpec(a,b,id){if(a>b)[a,b]=[b,a];const A=KSPEC[a],B=KSPEC[b],same=a===b,ix=Math.min(N-1,b+3+(same?1:0));
+function fzSpec(a,b,id){if(a>b)[a,b]=[b,a];const A=KSPEC[a],B=KSPEC[b],same=a===b,ix=Math.min(N-1,b+6+(same?2:0));
   const wa=FZW(A.name),wb=FZW(B.name),name=same?"Twin "+A.name:(wa[0]||"Fused")+"-"+(wb[wb.length-1]||"Fused")+" Key";
   const fx=[...new Set([...(B.fx||"").split(","),...(A.fx||"").split(","),"glow"].filter(Boolean))].slice(0,5).join(",");
   return{id,name,bow:B.bow,mat:same?A.mat:B.mat.split("+")[0]+"+"+A.mat.split("+")[0],gem:B.gem||A.gem,shaft:A.shaft,bit:B.bit,fx,a,b,ix,eq:SEED[ix]}}
@@ -2573,7 +2573,7 @@ function openSheet(ref){sheetRef=ref;const sh=$id("sheet"),F=isFusion(ref),gi=F?
   $id("shMeta").textContent=(F?"Fusion · "+TIER_NAMES[num(ref)]:TIER_NAMES[ref]+" · 1 in "+fmtOdds(ODDS[ref]))+" · owned ×"+haveCount(ref)+(isTrans(ref)?" · Transcendent":gi?" · "+GRADES[gi].n:"");
   const bf=$id("shBuff");bf.innerHTML="";const el=document.createElement("span");el.className="bchip";el.textContent=ELNAME[kb.el];el.style.color=kb.col;el.style.borderColor=colA(kb.col,.45);
   const tx=document.createElement("b");tx.textContent=kb.txt;tx.style.color=kb.col;bf.append(el,tx);
-  const nt=document.createElement("div");nt.className="shnote";nt.textContent=F&&FUSION_BY[ref].a!=null?"Fused from "+keyName(FUSION_BY[ref].a)+" + "+keyName(FUSION_BY[ref].b)+" · both buffs ×"+FZM+" · double chest loot":gi>=MAXG?"Celestial: buff at full power (×8)":(gi?GRADES[gi].n+" rank: buff ×"+RMUL[gi]+" · ":"")+"Next rank "+GRADES[gi+1].n+": ×"+RMUL[gi+1]+" · Celestial: ×8";bf.appendChild(nt);
+  const nt=document.createElement("div");nt.className="shnote";nt.textContent=F&&FUSION_BY[ref].a!=null?"Fused from "+keyName(FUSION_BY[ref].a)+" + "+keyName(FUSION_BY[ref].b)+" · both buffs ×"+FZM+" · double chest loot + 💎":gi>=MAXG?"Celestial: buff at full power (×8)":(gi?GRADES[gi].n+" rank: buff ×"+RMUL[gi]+" · ":"")+"Next rank "+GRADES[gi+1].n+": ×"+RMUL[gi+1]+" · Celestial: ×8";bf.appendChild(nt);
   const lad=document.createElement("div");lad.className="rladder";for(let q=0;q<=MAXG;q++){const d=document.createElement("span");d.className=(q<=gi?"on":"")+(q===gi?" cur":"");d.style.setProperty("--rc",q?GRADES[q].c:"#8a84a8");d.title=q?GRADES[q].n:"Base";lad.appendChild(d)}if(!F)bf.appendChild(lad);
   const bt=$id("shBtns");bt.innerHTML="";const mk=(t,cls,fn)=>{const b=document.createElement("button");b.className=cls;b.textContent=t;b.onclick=fn;bt.appendChild(b);return b};
   if(isEq(ref))mk("UNEQUIP","fbtn alt",()=>{S.equip=S.equip.filter(x=>x!==ref);afterEquip(ref,false)});
@@ -2765,7 +2765,7 @@ function rollChest(ti,L,B,mul){mul=mul||1;const n=Math.min(5,[1,1,2,2,3,3][ti]*m
   if(ti>=2&&!out.some(x=>x.type==="key")&&Math.random()<.4)out[0]={type:"key",ref:rollTier(L,B)};
   out.forEach(x=>{const u=S.ulv&&S.ulv[x.type];if(u&&UPT.includes(x.type))x.lv=Math.max(x.lv|0,u)});
   if(ti>=4&&Math.random()<(ti===5?.08:.03))out.push({type:"asc",n:1});
-  if(Math.random()<[.15,.18,.22,.26,.3,.36][ti]*(mul>1?1.8:1))out.push({type:"gems",n:(([lo,hi])=>lo+Math.floor(Math.random()*(hi-lo+1)))([[1,1],[1,1],[1,2],[1,3],[2,4],[3,6]][ti])});
+  if(mul>1||Math.random()<[.15,.18,.22,.26,.3,.36][ti])out.push({type:"gems",n:(([lo,hi])=>lo+Math.floor(Math.random()*(hi-lo+1)))([[1,1],[1,1],[1,2],[1,3],[2,4],[3,6]][ti])});
   for(let nv=collVal("nature")/100;nv>0;nv-=1)if(Math.random()<nv)out.push(Math.random()<.5?{type:"key",ref:rollTier(L,B)}:{type:"charge",n:1+(ti>>1)});
   return out}
 function applyLoot(it){
@@ -3052,12 +3052,12 @@ $id("pBg").onclick=()=>gClose("pSheet");$id("pX").onclick=()=>gClose("pSheet");
 /* ================= FUSE (abilities) ================= */
 const haveAb=t=>S.inv.filter(x=>x.type===t).reduce((a,x)=>a+x.n,0)+(S.abl||[]).filter(x=>x&&x.type===t).reduce((a,x)=>a+x.n,0);
 let FZMODE="fuse",fzA=null,fzB=null;
-const fzCost=(a,b)=>Math.max(1,Math.round(1.2*Math.log10(Math.max(1,ODDS[a])*Math.max(1,ODDS[b]))));
+const fzCost=(a,b)=>Math.max(1,Math.round(.45*Math.log10(Math.max(1,ODDS[a])*Math.max(1,ODDS[b]))));
 const fzLeft=r=>(S.counts[r]||0)-1-(fzA===r?1:0)-(fzB===r?1:0);
 function fzPrev(a,b){if(a>b)[a,b]=[b,a];const id="ZP"+a+"_"+b;if(!FUSION_BY[id])FUSION_BY[id]=fzSpec(a,b,id);return id}
 const fzIc=(it,px)=>it.key!=null?iconCanvas(it.key,false,isFusion(it.key)?0:gradeOf(it.key),Math.round(px*2.4)):ablIcon(it,px);
 function renderFuse(){const box=$id("fuseList");if(!box)return;box.innerHTML="";const gn=$id("fzGems");if(gn)gn.textContent="💎 "+(S.gems||0);
-  document.querySelectorAll("#fzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===FZMODE));$id("fzHint").textContent=FZMODE==="up"?"Upgrades are permanent and boost every copy you own or find":"Fuse 2 spare keys into a Fusion Key";
+  document.querySelectorAll("#fzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===FZMODE));$id("fzHint").textContent=FZMODE==="up"?"Upgrades are permanent and boost every copy you own or find":"Fuse 2 spare keys: both buffs ×2, higher rarity, double chest loot";
   if(FZMODE==="up"){renderUpg(box);return}
   if(fzA!=null&&(S.counts[fzA]||0)<2)fzA=null;if(fzB!=null&&(S.counts[fzB]||0)-1-(fzA===fzB?1:0)<1)fzB=null;if(fzA==null&&fzB!=null){fzA=fzB;fzB=null}
   const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -3137,9 +3137,9 @@ $id("fPost").onclick=async()=>{const t=$id("fText").value.trim();if(!t||!FB||!db
 document.querySelectorAll("#fSeg button").forEach(b=>b.onclick=()=>{fbSort=b.dataset.m;SFX.pop();renderFeedback()});
 $id("fBg").onclick=closeFeedback;$id("fX").onclick=closeFeedback;$id("fbBtn").onclick=openFeedback;
 /* ================= VERSION + PATCH NOTES ================= */
-const VERSION="2.7.10";
+const VERSION="2.7.12";
 const NOTES=[
- {v:"2.7.10",d:"Oct 8, 2026",i:["Much sharper effects, chest items and abilities on high-res phones","Triple Spin is now just upgraded Twin Spin, so copies always stack together","Better chests give more 💎 at once: up to 6 from the best chest","Cleaner chest reveals: just your items, lined up lower on the screen","Sharper ability icons with a thin moving outline in their colour","Chests drop 💎 more often","The Storm no longer fires on its own: tap ACTIVATE on the Storm card in Keys, and your next Mega Roll becomes a Storm roll","Transcending is way stronger: the key's buff is ×20 with 3× higher limits, and every Transcended key gives +25% luck and +15% chest luck forever, equipped or not","Upgrades now level up the whole ability: every copy you own and every one you find in chests","New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎40"]},
+ {v:"2.7.12",d:"Oct 8, 2026",i:["Upgrade any ability you've ever found, even if you've used them all up","Fusion is way better and cheaper: both buffs ×2 (with higher limits), a much rarer key, double chest loot with guaranteed 💎, and fusing costs far fewer gems","Much sharper effects, chest items and abilities on high-res phones","Triple Spin is now just upgraded Twin Spin, so copies always stack together","Better chests give more 💎 at once: up to 6 from the best chest","Cleaner chest reveals: just your items, lined up lower on the screen","Sharper ability icons with a thin moving outline in their colour","Chests drop 💎 more often","The Storm no longer fires on its own: tap ACTIVATE on the Storm card in Keys, and your next Mega Roll becomes a Storm roll","Transcending is way stronger: the key's buff is ×20 with 3× higher limits, and every Transcended key gives +25% luck and +15% chest luck forever, equipped or not","Upgrades now level up the whole ability: every copy you own and every one you find in chests","New Fuse: combine any 2 spare keys plus a few 💎 into a Fusion Key. It has both buffs, boosted, and opens chests with double loot","Ability upgrade prices now match how strong each ability is","Triple Spin and Mythic Floor can now drop from big chests","New intro animation with a warp, spinning dial and a 3D key","Chest opening rehaul: each item flies out to the centre for a big reveal, then lines up","A proper 3D key in chests: closer, spinning, with real thickness","Sharper keys, icons, chests and text on high-res screens","Buttons bounce when you tap them, and ready ones bob","New glowing progress bar on the Roll button","Fixed gem rewards: the card now always matches what you get","Transcending now costs 💎40"]},
  {v:"2.5.7",d:"Oct 7, 2026",i:["Ability upgrades are now much pricier: 💎10, then 20, then 35. All existing upgrades were reset to normal","Fixed chests going blank and the freeze when feeding the Storm (the game uses much less memory now)","Ability upgrades moved into the Fuse tab (Fuse / Upgrade), with the fusion animation","Smoother: less stutter, and the game lowers its effects quality by itself on slower phones","Mega Ticket fuse now costs 💎4","Only spare keys can be fed to the Storm, so you never lose your last copy","Storm, Tempest, Cataclysm and Worldbreaker each get their own roll button colours and outline","Upgraded abilities show stars and a coloured ring, and upgraded Boosted Rolls change colour (blue, purple, red)","30 new keys: 15 commons and 15 ultra-rares, up to the Prime Key at 1 in 1 Billion","New Fuse tab: spend abilities + a few gems to fuse stronger ones (Golden Aura, Mega Charge, Godly Charm, Triple Spin, Mythic Floor, Mega Ticket, Lucky Dice III)","Upgrade abilities one use at a time (💎10, then 20, then 35): Boosted Rolls, Clover, Golden Aura, Mega Charge, Rarity Floor, Twin Spin, Echo, Lucky Dice, Storm Siphon","Rarity Floor now guarantees 1 in 14+ and upgrades up to 1 in 10K+","Abilities collection: find ability types for a bonus slot, Triple Spin and stronger boosters","Twin and Triple Spin spin extra dials next to the main one","Chests: flip-card loot, zoom-in shake, bouncy hinged lid and a solid 3D key","Chest guide in the Chests tab","Ability names now show on every ability so Boosted Rolls are easy to spot","Common keys (under 1 in 100) no longer get the big animations"]},
  {v:"2.3",d:"Oct 6, 2026",i:["Key Roll got its own site: add it to your home screen, with an intro, cloud saves and save codes","Clash-style chests, gems and Transcending for Collection IV","Rare boosters: Golden Aura, Mega Charge, Godly Charm. All luck stacks","Ascendant Key and Collection IV, with a 3rd ability slot from Clockwork IV","Collection pages, key swapping and tap-twice to equip or unequip","New leaderboard with player profiles, plus a feedback board","Patch notes and automatic updates","Lots of fixes: full-screen layout, lag, chests vanishing, smoother tabs"]},
  {v:"1.7",d:"Oct 5, 2026",i:["Element collections with permanent boosts","Storm levels: Tempest ×50, Cataclysm ×75, Worldbreaker ×100","Worth leaderboard"]},
